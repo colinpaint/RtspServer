@@ -1,14 +1,14 @@
 // PHZ
 // 2018-5-15
-
+//{{{  includes
 #include "NetInterface.h"
 #include "Socket.h"
-
+//}}}
 using namespace xop;
 
 std::string NetInterface::GetLocalIPAddress()
 {
-#if defined(__linux) || defined(__linux__) 
+#if defined(__linux) || defined(__linux__)
     SOCKET sockfd = 0;
     char buf[512] = { 0 };
     struct ifconf ifconf;
@@ -69,12 +69,12 @@ std::string NetInterface::GetLocalIPAddress()
             if (strcmp(pIpAddrString->IpAddress.String, "127.0.0.1")!=0
                 && strcmp(pIpAddrString->IpAddress.String, "0.0.0.0")!=0)
             {
-                // pIpAddrString->IpMask.String 
+                // pIpAddrString->IpMask.String
                 //pIpAdapterInfo->GatewayList.IpAddress.String
                 std::string ip(pIpAddrString->IpAddress.String);
                 //delete pIpAdapterInfo;
                 return ip;
-            }		
+            }
             pIpAddrString = pIpAddrString->Next;
         } while (pIpAddrString);
         pIpAdapterInfo = pIpAdapterInfo->Next;
