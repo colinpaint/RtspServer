@@ -23,3 +23,7 @@ font/build/*
 *.~*
 *.*~
 *.*;*
+
+rtsp_h264_file
+rtsp_pusher
+rtsp_server

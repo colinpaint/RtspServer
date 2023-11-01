@@ -1,6 +1,7 @@
-﻿#include "H264Parser.h"
+//{{{  includes
+#include "H264Parser.h"
 #include <cstring>
-
+//}}}
 using namespace xop;
 
 Nal H264Parser::findNal(const uint8_t *data, uint32_t size)
@@ -25,7 +26,7 @@ Nal H264Parser::findNal(const uint8_t *data, uint32_t size)
     {
         if ((prefix[pos % 3] == 0) && (prefix[(pos + 1) % 3] == 0) && (prefix[(pos + 2) % 3] == 1))
         {
-            if(nal.first == nullptr) // 00 00 01 
+            if(nal.first == nullptr) // 00 00 01
             {
                 nal.first = const_cast<uint8_t*>(data) + 1;
                 startCode = 3;
@@ -34,39 +35,37 @@ Nal H264Parser::findNal(const uint8_t *data, uint32_t size)
             {
                 nal.second = const_cast<uint8_t*>(data) - 3;
                 break;
-            }               
+            }
         }
         else if ((prefix[pos % 3] == 0) && (prefix[(pos + 1) % 3] == 0) && (prefix[(pos + 2) % 3] == 0))
         {
-            if (*(data+1) == 0x01) // 00 00 00 01 
-            {              
+            if (*(data+1) == 0x01) // 00 00 00 01
+            {
                 if(nal.first == nullptr)
                 {
                     if(size >= 1)
                     {
                         nal.first = const_cast<uint8_t*>(data) + 2;
-                    }                       
+                    }
                     else
                     {
-                        break;  
-                    }                  
+                        break;
+                    }
                     startCode = 4;
                 }
                 else if(startCode == 4)
                 {
                     nal.second = const_cast<uint8_t*>(data) - 3;
                     break;
-                }                    
+                }
             }
         }
 
         prefix[(pos++) % 3] = *(++data);
     }
-        
+
     if(nal.first == nullptr)
         nal.second = nullptr;
 
     return nal;
 }
-
-

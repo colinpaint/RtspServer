@@ -1,15 +1,17 @@
-﻿// PHZ
+// PHZ
 // 2018-9-30
-
+//{{{  includes
 #include "RtpConnection.h"
 #include "RtspConnection.h"
 #include "net/SocketUtil.h"
+//}}}
 
 using namespace std;
 using namespace xop;
 
+//{{{
 RtpConnection::RtpConnection(std::weak_ptr<TcpConnection> rtsp_connection)
-    : rtsp_connection_(rtsp_connection)
+		: rtsp_connection_(rtsp_connection)
 {
 	std::random_device rd;
 
@@ -28,7 +30,8 @@ RtpConnection::RtpConnection(std::weak_ptr<TcpConnection> rtsp_connection)
 	rtsp_ip_ = conn->GetIp();
 	rtsp_port_ = conn->GetPort();
 }
-
+//}}}
+//{{{
 RtpConnection::~RtpConnection()
 {
 	for(int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
@@ -41,7 +44,9 @@ RtpConnection::~RtpConnection()
 		}
 	}
 }
+//}}}
 
+//{{{
 int RtpConnection::GetId() const
 {
 	auto conn = rtsp_connection_.lock();
@@ -51,7 +56,9 @@ int RtpConnection::GetId() const
 	RtspConnection *rtspConn = (RtspConnection *)conn.get();
 	return rtspConn->GetId();
 }
+//}}}
 
+//{{{
 bool RtpConnection::SetupRtpOverTcp(MediaChannelId channel_id, uint16_t rtp_channel, uint16_t rtcp_channel)
 {
 	auto conn = rtsp_connection_.lock();
@@ -68,7 +75,8 @@ bool RtpConnection::SetupRtpOverTcp(MediaChannelId channel_id, uint16_t rtp_chan
 
 	return true;
 }
-
+//}}}
+//{{{
 bool RtpConnection::SetupRtpOverUdp(MediaChannelId channel_id, uint16_t rtp_port, uint16_t rtcp_port)
 {
 	auto conn = rtsp_connection_.lock();
@@ -88,7 +96,7 @@ bool RtpConnection::SetupRtpOverUdp(MediaChannelId channel_id, uint16_t rtp_port
 		if (n == 10) {
 			return false;
 		}
-        
+
 		local_rtp_port_[channel_id] = rd() & 0xfffe;
 		local_rtcp_port_[channel_id] =local_rtp_port_[channel_id] + 1;
 
@@ -123,15 +131,16 @@ bool RtpConnection::SetupRtpOverUdp(MediaChannelId channel_id, uint16_t rtp_port
 
 	return true;
 }
-
+//}}}
+//{{{
 bool RtpConnection::SetupRtpOverMulticast(MediaChannelId channel_id, std::string ip, uint16_t port)
 {
-    std::random_device rd;
-    for (int n = 0; n <= 10; n++) {
+		std::random_device rd;
+		for (int n = 0; n <= 10; n++) {
 		if (n == 10) {
 			return false;
 		}
-       
+
 		local_rtp_port_[channel_id] = rd() & 0xfffe;
 		rtpfd_[channel_id] = ::socket(AF_INET, SOCK_DGRAM, 0);
 		if (!SocketUtil::Bind(rtpfd_[channel_id], "0.0.0.0", local_rtp_port_[channel_id])) {
@@ -140,7 +149,7 @@ bool RtpConnection::SetupRtpOverMulticast(MediaChannelId channel_id, std::string
 		}
 
 		break;
-    }
+		}
 
 	media_channel_info_[channel_id].rtp_port = port;
 
@@ -153,7 +162,9 @@ bool RtpConnection::SetupRtpOverMulticast(MediaChannelId channel_id, std::string
 	is_multicast_ = true;
 	return true;
 }
+//}}}
 
+//{{{
 void RtpConnection::Play()
 {
 	for(int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
@@ -162,7 +173,8 @@ void RtpConnection::Play()
 		}
 	}
 }
-
+//}}}
+//{{{
 void RtpConnection::Record()
 {
 	for (int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
@@ -172,7 +184,8 @@ void RtpConnection::Record()
 		}
 	}
 }
-
+//}}}
+//{{{
 void RtpConnection::Teardown()
 {
 	if(!is_closed_) {
@@ -183,12 +196,15 @@ void RtpConnection::Teardown()
 		}
 	}
 }
+//}}}
 
+//{{{
 string RtpConnection::GetMulticastIp(MediaChannelId channel_id) const
 {
 	return std::string(inet_ntoa(peer_rtp_addr_[channel_id].sin_addr));
 }
-
+//}}}
+//{{{
 string RtpConnection::GetRtpInfo(const std::string& rtsp_url)
 {
 	char buf[2048] = { 0 };
@@ -203,7 +219,7 @@ string RtpConnection::GetRtpInfo(const std::string& rtsp_url)
 		if (media_channel_info_[chn].is_setup) {
 			if (num_channel != 0) {
 				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ",");
-			}			
+			}
 
 			snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf),
 					"url=%s/track%d;seq=0;rtptime=%u",
@@ -214,7 +230,9 @@ string RtpConnection::GetRtpInfo(const std::string& rtsp_url)
 
 	return std::string(buf);
 }
+//}}}
 
+//{{{
 void RtpConnection::SetFrameType(uint8_t frame_type)
 {
 	frame_type_ = frame_type;
@@ -222,7 +240,8 @@ void RtpConnection::SetFrameType(uint8_t frame_type)
 		has_key_frame_ = true;
 	}
 }
-
+//}}}
+//{{{
 void RtpConnection::SetRtpHeader(MediaChannelId channel_id, RtpPacket pkt)
 {
 	if((media_channel_info_[channel_id].is_play || media_channel_info_[channel_id].is_record) && has_key_frame_) {
@@ -232,13 +251,14 @@ void RtpConnection::SetRtpHeader(MediaChannelId channel_id, RtpPacket pkt)
 		memcpy(pkt.data.get()+4, &media_channel_info_[channel_id].rtp_header, RTP_HEADER_SIZE);
 	}
 }
-
+//}}}
+//{{{
 int RtpConnection::SendRtpPacket(MediaChannelId channel_id, RtpPacket pkt)
-{    
+{
 	if (is_closed_) {
 		return -1;
 	}
-   
+
 	auto conn = rtsp_connection_.lock();
 	if (!conn) {
 		return -1;
@@ -249,14 +269,14 @@ int RtpConnection::SendRtpPacket(MediaChannelId channel_id, RtpPacket pkt)
 	bool ret = rtsp_conn->task_scheduler_->AddTriggerEvent([this, channel_id, pkt] {
 		this->SetFrameType(pkt.type);
 		this->SetRtpHeader(channel_id, pkt);
-		if((media_channel_info_[channel_id].is_play || media_channel_info_[channel_id].is_record) && has_key_frame_ ) {            
+		if((media_channel_info_[channel_id].is_play || media_channel_info_[channel_id].is_record) && has_key_frame_ ) {
 			if(transport_mode_ == RTP_OVER_TCP) {
 				SendRtpOverTcp(channel_id, pkt);
 			}
 			else {
 				SendRtpOverUdp(channel_id, pkt);
 			}
-                   
+
 			//media_channel_info_[channel_id].octetCount  += pkt.size;
 			//media_channel_info_[channel_id].packetCount += 1;
 		}
@@ -264,7 +284,8 @@ int RtpConnection::SendRtpPacket(MediaChannelId channel_id, RtpPacket pkt)
 
 	return ret ? 0 : -1;
 }
-
+//}}}
+//{{{
 int RtpConnection::SendRtpOverTcp(MediaChannelId channel_id, RtpPacket pkt)
 {
 	auto conn = rtsp_connection_.lock();
@@ -281,16 +302,18 @@ int RtpConnection::SendRtpOverTcp(MediaChannelId channel_id, RtpPacket pkt)
 	conn->Send((char*)rtpPktPtr, pkt.size);
 	return pkt.size;
 }
-
+//}}}
+//{{{
 int RtpConnection::SendRtpOverUdp(MediaChannelId channel_id, RtpPacket pkt)
 {
 	int ret = sendto(rtpfd_[channel_id], (const char*)pkt.data.get()+4, pkt.size-4, 0,
 					(struct sockaddr *)&(peer_rtp_addr_[channel_id]), sizeof(struct sockaddr_in));
-                   
-	if(ret < 0) {        
+
+	if(ret < 0) {
 		Teardown();
 		return -1;
 	}
 
 	return ret;
 }
+//}}}

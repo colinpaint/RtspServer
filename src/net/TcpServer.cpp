@@ -1,12 +1,15 @@
+//{{{  includes
 #include "TcpServer.h"
 #include "Acceptor.h"
 #include "EventLoop.h"
 #include "Logger.h"
-#include <cstdio>  
+#include <cstdio>
+//}}}
 
 using namespace xop;
 using namespace std;
 
+//{{{
 TcpServer::TcpServer(EventLoop* event_loop)
 	: event_loop_(event_loop)
 	, port_(0)
@@ -27,12 +30,15 @@ TcpServer::TcpServer(EventLoop* event_loop)
 		}
 	});
 }
-
+//}}}
+//{{{
 TcpServer::~TcpServer()
 {
 	Stop();
 }
+//}}}
 
+//{{{
 bool TcpServer::Start(std::string ip, uint16_t port)
 {
 	Stop();
@@ -50,10 +56,11 @@ bool TcpServer::Start(std::string ip, uint16_t port)
 
 	return false;
 }
-
+//}}}
+//{{{
 void TcpServer::Stop()
 {
-	if (is_started_) {		
+	if (is_started_) {
 		mutex_.lock();
 		for (auto iter : connections_) {
 			iter.second->Disconnect();
@@ -69,22 +76,28 @@ void TcpServer::Stop()
 				break;
 			}
 		}
-	}	
+	}
 }
+//}}}
 
+//{{{
 TcpConnection::Ptr TcpServer::OnConnect(SOCKET sockfd)
 {
 	return std::make_shared<TcpConnection>(event_loop_->GetTaskScheduler().get(), sockfd);
 }
+//}}}
 
+//{{{
 void TcpServer::AddConnection(SOCKET sockfd, TcpConnection::Ptr tcpConn)
 {
 	std::lock_guard<std::mutex> locker(mutex_);
 	connections_.emplace(sockfd, tcpConn);
 }
-
+//}}}
+//{{{
 void TcpServer::RemoveConnection(SOCKET sockfd)
 {
 	std::lock_guard<std::mutex> locker(mutex_);
 	connections_.erase(sockfd);
 }
+//}}}

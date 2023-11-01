@@ -3,6 +3,7 @@
 
 using namespace xop;
 
+//{{{
 TcpConnection::TcpConnection(TaskScheduler *task_scheduler, SOCKET sockfd)
 	: task_scheduler_(task_scheduler)
 	, read_buffer_(new BufferReader)
@@ -23,7 +24,8 @@ TcpConnection::TcpConnection(TaskScheduler *task_scheduler, SOCKET sockfd)
 	channel_->EnableReading();
 	task_scheduler_->UpdateChannel(channel_);
 }
-
+//}}}
+//{{{
 TcpConnection::~TcpConnection()
 {
 	SOCKET fd = channel_->GetSocket();
@@ -31,7 +33,9 @@ TcpConnection::~TcpConnection()
 		SocketUtil::Close(fd);
 	}
 }
+//}}}
 
+//{{{
 void TcpConnection::Send(std::shared_ptr<char> data, uint32_t size)
 {
 	if (!is_closed_) {
@@ -42,7 +46,8 @@ void TcpConnection::Send(std::shared_ptr<char> data, uint32_t size)
 		this->HandleWrite();
 	}
 }
-
+//}}}
+//{{{
 void TcpConnection::Send(const char *data, uint32_t size)
 {
 	if (!is_closed_) {
@@ -53,7 +58,9 @@ void TcpConnection::Send(const char *data, uint32_t size)
 		this->HandleWrite();
 	}
 }
+//}}}
 
+//{{{
 void TcpConnection::Disconnect()
 {
 	std::lock_guard<std::mutex> lock(mutex_);
@@ -62,7 +69,9 @@ void TcpConnection::Disconnect()
 		conn->Close();
 	});
 }
+//}}}
 
+//{{{
 void TcpConnection::HandleRead()
 {
 	{
@@ -71,7 +80,7 @@ void TcpConnection::HandleRead()
 		if (is_closed_) {
 			return;
 		}
-		
+
 		int ret = read_buffer_->Read(channel_->GetSocket());
 		if (ret <= 0) {
 			this->Close();
@@ -87,13 +96,14 @@ void TcpConnection::HandleRead()
 		}
 	}
 }
-
+//}}}
+//{{{
 void TcpConnection::HandleWrite()
 {
 	if (is_closed_) {
 		return;
 	}
-	
+
 	//std::lock_guard<std::mutex> lock(mutex_);
 	if (!mutex_.try_lock()) {
 		return;
@@ -125,7 +135,9 @@ void TcpConnection::HandleWrite()
 
 	mutex_.unlock();
 }
+//}}}
 
+//{{{
 void TcpConnection::Close()
 {
 	if (!is_closed_) {
@@ -134,22 +146,26 @@ void TcpConnection::Close()
 
 		if (close_cb_) {
 			close_cb_(shared_from_this());
-		}			
+		}
 
 		if (disconnect_cb_) {
 			disconnect_cb_(shared_from_this());
-		}	
+		}
 	}
 }
+//}}}
 
+//{{{
 void TcpConnection::HandleClose()
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	this->Close();
 }
-
+//}}}
+//{{{
 void TcpConnection::HandleError()
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	this->Close();
 }
+//}}}
