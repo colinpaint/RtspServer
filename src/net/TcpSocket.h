@@ -1,19 +1,14 @@
 // PHZ
 // 2018-5-15
-
-#ifndef XOP_TCP_SOCKET_H
-#define XOP_TCP_SOCKET_H
-
+#pragma once
 #include <cstdint>
 #include <string>
 #include "Socket.h"
 
-namespace xop
-{
-    
-class TcpSocket
-{
-public:
+namespace xop {
+
+class TcpSocket {
+  public:
     TcpSocket(SOCKET sockfd=-1);
     virtual ~TcpSocket();
 
@@ -25,11 +20,8 @@ public:
     void   Close();
     void   ShutdownWrite();
     SOCKET GetSocket() const { return sockfd_; }
-    
-private:
+
+  private:
     SOCKET sockfd_ = -1;
-};
-
-}
-
-#endif
+    };
+  }

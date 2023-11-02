@@ -1,3 +1,4 @@
+// PHZ 2018-6-10
 //{{{  includes
 #include "H264Parser.h"
 #include <cstring>
@@ -7,7 +8,7 @@ using namespace xop;
 Nal H264Parser::findNal(const uint8_t *data, uint32_t size) {
 
   Nal nal(nullptr, nullptr);
-  if (size < 5) 
+  if (size < 5)
     return nal;
 
   nal.second = const_cast<uint8_t*>(data) + (size-1);

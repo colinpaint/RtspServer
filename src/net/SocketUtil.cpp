@@ -5,7 +5,6 @@
 #include "Socket.h"
 #include <iostream>
 //}}}
-
 using namespace xop;
 
 //{{{

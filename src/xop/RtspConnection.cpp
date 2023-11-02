@@ -1,5 +1,4 @@
-// PHZ
-// 2018-6-10
+// PHZ 2018-6-10
 //{{{  includes
 #include "RtspConnection.h"
 #include "RtspServer.h"

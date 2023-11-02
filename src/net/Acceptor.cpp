@@ -7,7 +7,7 @@
 using namespace xop;
 
 //{{{
-Acceptor::Acceptor(EventLoop* eventLoop)
+Acceptor::Acceptor (EventLoop* eventLoop)
     : event_loop_(eventLoop)
     , tcp_socket_(new TcpSocket)
 {
@@ -22,7 +22,7 @@ Acceptor::~Acceptor()
 //}}}
 
 //{{{
-int Acceptor::Listen(std::string ip, uint16_t port)
+int Acceptor::Listen (std::string ip, uint16_t port)
 {
   std::lock_guard<std::mutex> locker(mutex_);
 

@@ -7,7 +7,6 @@
 #include <cstring>
 #include <forward_list>
 //}}}
-
 using namespace xop;
 
 #define SELECT_CTL_ADD  0
