@@ -20,7 +20,7 @@ Nal H264Parser::findNal(const uint8_t *data, uint32_t size) {
   size -= 3;
   data += 2;
 
-  while(size--) {
+  while (size--) {
     if ((prefix[pos % 3] == 0) && (prefix[(pos + 1) % 3] == 0) && (prefix[(pos + 2) % 3] == 1)) {
       if(nal.first == nullptr) { // 00 00 01
         nal.first = const_cast<uint8_t*>(data) + 1;

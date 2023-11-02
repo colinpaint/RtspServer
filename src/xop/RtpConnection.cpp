@@ -4,20 +4,19 @@
 #include "RtspConnection.h"
 #include "net/SocketUtil.h"
 //}}}
-
 using namespace std;
 using namespace xop;
 
 //{{{
 RtpConnection::RtpConnection(std::weak_ptr<TcpConnection> rtsp_connection)
-    : rtsp_connection_(rtsp_connection)
-{
+    : rtsp_connection_(rtsp_connection) {
+
   std::random_device rd;
 
-  for(int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
+  for (int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
     rtpfd_[chn] = 0;
     rtcpfd_[chn] = 0;
-    memset(&media_channel_info_[chn], 0, sizeof(media_channel_info_[chn]));
+    memset (&media_channel_info_[chn], 0, sizeof(media_channel_info_[chn]));
     media_channel_info_[chn].rtp_header.version = RTP_VERSION;
     media_channel_info_[chn].packet_seq = rd()&0xffff;
     media_channel_info_[chn].rtp_header.seq = 0; //htons(1);
@@ -31,39 +30,40 @@ RtpConnection::RtpConnection(std::weak_ptr<TcpConnection> rtsp_connection)
 }
 //}}}
 //{{{
-RtpConnection::~RtpConnection()
-{
-  for(int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
-    if(rtpfd_[chn] > 0) {
-      SocketUtil::Close(rtpfd_[chn]);
-    }
+RtpConnection::~RtpConnection() {
 
-    if(rtcpfd_[chn] > 0) {
+  for (int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
+    if (rtpfd_[chn] > 0) {
+      SocketUtil::Close(rtpfd_[chn]);
+      }
+
+    if (rtcpfd_[chn] > 0) {
       SocketUtil::Close(rtcpfd_[chn]);
+      }
     }
   }
-}
 //}}}
 
 //{{{
-int RtpConnection::GetId() const
-{
+int RtpConnection::GetId() const {
+
   auto conn = rtsp_connection_.lock();
   if (!conn) {
     return -1;
-  }
+    }
+
   RtspConnection *rtspConn = (RtspConnection *)conn.get();
   return rtspConn->GetId();
-}
+  }
 //}}}
 
 //{{{
-bool RtpConnection::SetupRtpOverTcp(MediaChannelId channel_id, uint16_t rtp_channel, uint16_t rtcp_channel)
-{
+bool RtpConnection::SetupRtpOverTcp (MediaChannelId channel_id, uint16_t rtp_channel, uint16_t rtcp_channel) {
+
   auto conn = rtsp_connection_.lock();
   if (!conn) {
     return false;
-  }
+    }
 
   media_channel_info_[channel_id].rtp_channel = rtp_channel;
   media_channel_info_[channel_id].rtcp_channel = rtcp_channel;
@@ -73,19 +73,19 @@ bool RtpConnection::SetupRtpOverTcp(MediaChannelId channel_id, uint16_t rtp_chan
   transport_mode_ = RTP_OVER_TCP;
 
   return true;
-}
+  }
 //}}}
 //{{{
-bool RtpConnection::SetupRtpOverUdp(MediaChannelId channel_id, uint16_t rtp_port, uint16_t rtcp_port)
-{
+bool RtpConnection::SetupRtpOverUdp (MediaChannelId channel_id, uint16_t rtp_port, uint16_t rtcp_port) { 
+
   auto conn = rtsp_connection_.lock();
   if (!conn) {
     return false;
-  }
+    }
 
   if(SocketUtil::GetPeerAddr(conn->GetSocket(), &peer_addr_) < 0) {
     return false;
-  }
+    }
 
   media_channel_info_[channel_id].rtp_port = rtp_port;
   media_channel_info_[channel_id].rtcp_port = rtcp_port;
@@ -94,7 +94,7 @@ bool RtpConnection::SetupRtpOverUdp(MediaChannelId channel_id, uint16_t rtp_port
   for (int n = 0; n <= 10; n++) {
     if (n == 10) {
       return false;
-    }
+      }
 
     local_rtp_port_[channel_id] = rd() & 0xfffe;
     local_rtcp_port_[channel_id] =local_rtp_port_[channel_id] + 1;
@@ -103,17 +103,17 @@ bool RtpConnection::SetupRtpOverUdp(MediaChannelId channel_id, uint16_t rtp_port
     if(!SocketUtil::Bind(rtpfd_[channel_id], "0.0.0.0",  local_rtp_port_[channel_id])) {
       SocketUtil::Close(rtpfd_[channel_id]);
       continue;
-    }
+      }
 
     rtcpfd_[channel_id] = ::socket(AF_INET, SOCK_DGRAM, 0);
     if(!SocketUtil::Bind(rtcpfd_[channel_id], "0.0.0.0", local_rtcp_port_[channel_id])) {
       SocketUtil::Close(rtpfd_[channel_id]);
       SocketUtil::Close(rtcpfd_[channel_id]);
       continue;
-    }
+      }
 
     break;
-  }
+    }
 
   SocketUtil::SetSendBufSize(rtpfd_[channel_id], 50*1024);
 
@@ -129,23 +129,23 @@ bool RtpConnection::SetupRtpOverUdp(MediaChannelId channel_id, uint16_t rtp_port
   transport_mode_ = RTP_OVER_UDP;
 
   return true;
-}
+  }
 //}}}
 //{{{
-bool RtpConnection::SetupRtpOverMulticast(MediaChannelId channel_id, std::string ip, uint16_t port)
+bool RtpConnection::SetupRtpOverMulticast (MediaChannelId channel_id, std::string ip, uint16_t port)
 {
     std::random_device rd;
     for (int n = 0; n <= 10; n++) {
     if (n == 10) {
       return false;
-    }
+      }
 
     local_rtp_port_[channel_id] = rd() & 0xfffe;
     rtpfd_[channel_id] = ::socket(AF_INET, SOCK_DGRAM, 0);
     if (!SocketUtil::Bind(rtpfd_[channel_id], "0.0.0.0", local_rtp_port_[channel_id])) {
       SocketUtil::Close(rtpfd_[channel_id]);
       continue;
-    }
+      }
 
     break;
     }
@@ -160,7 +160,7 @@ bool RtpConnection::SetupRtpOverMulticast(MediaChannelId channel_id, std::string
   transport_mode_ = RTP_OVER_MULTICAST;
   is_multicast_ = true;
   return true;
-}
+  }
 //}}}
 
 //{{{
@@ -169,43 +169,43 @@ void RtpConnection::Play()
   for(int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
     if (media_channel_info_[chn].is_setup) {
       media_channel_info_[chn].is_play = true;
+      }
     }
   }
-}
 //}}}
 //{{{
-void RtpConnection::Record()
-{
+void RtpConnection::Record() {
+
   for (int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
     if (media_channel_info_[chn].is_setup) {
       media_channel_info_[chn].is_record = true;
       media_channel_info_[chn].is_play = true;
+      }
     }
   }
-}
 //}}}
 //{{{
-void RtpConnection::Teardown()
-{
-  if(!is_closed_) {
+void RtpConnection::Teardown() {
+
+  if (!is_closed_) {
     is_closed_ = true;
-    for(int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
+    for (int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
       media_channel_info_[chn].is_play = false;
       media_channel_info_[chn].is_record = false;
+      }
     }
   }
-}
 //}}}
 
 //{{{
-string RtpConnection::GetMulticastIp(MediaChannelId channel_id) const
-{
+string RtpConnection::GetMulticastIp (MediaChannelId channel_id) const {
+
   return std::string(inet_ntoa(peer_rtp_addr_[channel_id].sin_addr));
-}
+  }
 //}}}
 //{{{
-string RtpConnection::GetRtpInfo(const std::string& rtsp_url)
-{
+string RtpConnection::GetRtpInfo (const std::string& rtsp_url) {
+
   char buf[2048] = { 0 };
   snprintf(buf, 1024, "RTP-Info: ");
 
@@ -224,44 +224,44 @@ string RtpConnection::GetRtpInfo(const std::string& rtsp_url)
           "url=%s/track%d;seq=0;rtptime=%u",
           rtsp_url.c_str(), chn, rtpTime);
       num_channel++;
+      }
     }
-  }
 
   return std::string(buf);
-}
+  }
 //}}}
 
 //{{{
-void RtpConnection::SetFrameType(uint8_t frame_type)
-{
+void RtpConnection::SetFrameType (uint8_t frame_type) {
+
   frame_type_ = frame_type;
-  if(!has_key_frame_ && (frame_type == 0 || frame_type == VIDEO_FRAME_I)) {
+  if (!has_key_frame_ && (frame_type == 0 || frame_type == VIDEO_FRAME_I)) {
     has_key_frame_ = true;
+    }
   }
-}
 //}}}
 //{{{
-void RtpConnection::SetRtpHeader(MediaChannelId channel_id, RtpPacket pkt)
-{
+void RtpConnection::SetRtpHeader (MediaChannelId channel_id, RtpPacket pkt) {
+
   if((media_channel_info_[channel_id].is_play || media_channel_info_[channel_id].is_record) && has_key_frame_) {
     media_channel_info_[channel_id].rtp_header.marker = pkt.last;
     media_channel_info_[channel_id].rtp_header.ts = htonl(pkt.timestamp);
     media_channel_info_[channel_id].rtp_header.seq = htons(media_channel_info_[channel_id].packet_seq++);
     memcpy(pkt.data.get()+4, &media_channel_info_[channel_id].rtp_header, RTP_HEADER_SIZE);
+    }
   }
-}
 //}}}
 //{{{
-int RtpConnection::SendRtpPacket(MediaChannelId channel_id, RtpPacket pkt)
-{
+int RtpConnection::SendRtpPacket (MediaChannelId channel_id, RtpPacket pkt) {
+
   if (is_closed_) {
     return -1;
-  }
+    }
 
   auto conn = rtsp_connection_.lock();
   if (!conn) {
     return -1;
-  }
+    }
 
   RtspConnection *rtsp_conn = (RtspConnection *)conn.get();
 
@@ -278,19 +278,19 @@ int RtpConnection::SendRtpPacket(MediaChannelId channel_id, RtpPacket pkt)
 
       //media_channel_info_[channel_id].octetCount  += pkt.size;
       //media_channel_info_[channel_id].packetCount += 1;
-    }
-  });
+      }
+    });
 
   return ret ? 0 : -1;
-}
+  }
 //}}}
 //{{{
-int RtpConnection::SendRtpOverTcp(MediaChannelId channel_id, RtpPacket pkt)
-{
+int RtpConnection::SendRtpOverTcp (MediaChannelId channel_id, RtpPacket pkt) {
+
   auto conn = rtsp_connection_.lock();
   if (!conn) {
     return -1;
-  }
+    }
 
   uint8_t* rtpPktPtr = pkt.data.get();
   rtpPktPtr[0] = '$';
@@ -300,19 +300,19 @@ int RtpConnection::SendRtpOverTcp(MediaChannelId channel_id, RtpPacket pkt)
 
   conn->Send((char*)rtpPktPtr, pkt.size);
   return pkt.size;
-}
+  }
 //}}}
 //{{{
-int RtpConnection::SendRtpOverUdp(MediaChannelId channel_id, RtpPacket pkt)
-{
+int RtpConnection::SendRtpOverUdp (MediaChannelId channel_id, RtpPacket pkt) {
+
   int ret = sendto(rtpfd_[channel_id], (const char*)pkt.data.get()+4, pkt.size-4, 0,
           (struct sockaddr *)&(peer_rtp_addr_[channel_id]), sizeof(struct sockaddr_in));
 
   if(ret < 0) {
     Teardown();
     return -1;
-  }
+    }
 
   return ret;
-}
+  }
 //}}}

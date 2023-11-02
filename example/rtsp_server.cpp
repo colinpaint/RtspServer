@@ -1,5 +1,4 @@
 // RTSP Server
-
 #include "xop/RtspServer.h"
 #include "net/Timer.h"
 #include <thread>
@@ -7,61 +6,11 @@
 #include <iostream>
 #include <string>
 
-void SendFrameThread (xop::RtspServer* rtsp_server, xop::MediaSessionId session_id, int& clients);
-
 //{{{
-int main(int argc, char **argv)
+void SendFrameThread (xop::RtspServer* rtsp_server, xop::MediaSessionId session_id, int& clients)
 {
-	int clients = 0;
-	std::string ip = "0.0.0.0";
-	std::string rtsp_url = "rtsp://127.0.0.1:554/live";
-
-	std::shared_ptr<xop::EventLoop> event_loop(new xop::EventLoop());
-	std::shared_ptr<xop::RtspServer> server = xop::RtspServer::Create(event_loop.get());
-	if (!server->Start(ip, 554)) {
-		return -1;
-	}
-
-#ifdef AUTH_CONFIG
-	server->SetAuthConfig("-_-", "admin", "12345");
-#endif
-
-	xop::MediaSession *session = xop::MediaSession::CreateNew("live"); // url: rtsp://ip/live
-	session->AddSource(xop::channel_0, xop::H264Source::CreateNew());
-	session->AddSource(xop::channel_1, xop::AACSource::CreateNew(44100,2));
-	// session->startMulticast(); /* 开启组播(ip,端口随机生成), 默认使用 RTP_OVER_UDP, RTP_OVER_RTSP */
-
-	session->AddNotifyConnectedCallback([] (xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port){
-		printf("RTSP client connect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
-	});
-
-	session->AddNotifyDisconnectedCallback([](xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port) {
-		printf("RTSP client disconnect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
-	});
-
-	std::cout << "URL: " << rtsp_url << std::endl;
-
-	xop::MediaSessionId session_id = server->AddSession(session);
-	//server->removeMeidaSession(session_id); /* 取消会话, 接口线程安全 */
-
-	std::thread thread(SendFrameThread, server.get(), session_id, std::ref(clients));
-	thread.detach();
-
-	while(1) {
-		xop::Timer::Sleep(100);
-	}
-
-	getchar();
-	return 0;
-}
-//}}}
-
-//{{{
-void SendFrameThread(xop::RtspServer* rtsp_server, xop::MediaSessionId session_id, int& clients)
-{
-	while(1)
-	{
-		if(clients > 0) /* 会话有客户端在线, 发送音视频数据 */
+	while (1) {
+		if (clients > 0) /* 会话有客户端在线, 发送音视频数据 */
 		{
 			{
 				/*
@@ -95,4 +44,51 @@ void SendFrameThread(xop::RtspServer* rtsp_server, xop::MediaSessionId session_i
 		xop::Timer::Sleep(1); /* 实际使用需要根据帧率计算延时! */
 	}
 }
+//}}}
+
+//{{{
+int main (int argc, char** argv) {
+
+	int clients = 0;
+	std::string ip = "0.0.0.0";
+	std::string rtsp_url = "rtsp://127.0.0.1:554/live";
+
+	std::shared_ptr<xop::EventLoop> event_loop (new xop::EventLoop());
+	std::shared_ptr<xop::RtspServer> server = xop::RtspServer::Create (event_loop.get());
+	if (!server->Start(ip, 554)) {
+		return -1;
+	}
+
+	#ifdef AUTH_CONFIG
+		server->SetAuthConfig("-_-", "admin", "12345");
+	#endif
+
+	xop::MediaSession* session = xop::MediaSession::CreateNew ("live"); // url: rtsp://ip/live
+	session->AddSource (xop::channel_0, xop::H264Source::CreateNew());
+	session->AddSource (xop::channel_1, xop::AACSource::CreateNew (44100,2));
+	// session->startMulticast(); /* 开启组播(ip,端口随机生成), 默认使用 RTP_OVER_UDP, RTP_OVER_RTSP */
+
+	session->AddNotifyConnectedCallback([] (xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port){
+		printf("RTSP client connect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
+		});
+
+	session->AddNotifyDisconnectedCallback([](xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port) {
+		printf("RTSP client disconnect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
+		});
+
+	std::cout << "URL: " << rtsp_url << std::endl;
+
+	xop::MediaSessionId session_id = server->AddSession(session);
+	//server->removeMeidaSession(session_id); /* 取消会话, 接口线程安全 */
+
+	std::thread thread(SendFrameThread, server.get(), session_id, std::ref(clients));
+	thread.detach();
+
+	while(1) {
+		xop::Timer::Sleep(100);
+		}
+
+	getchar();
+	return 0;
+	}
 //}}}
