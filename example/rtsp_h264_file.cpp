@@ -14,7 +14,7 @@ public:
 	H264File (int buf_size=500000);
 	~H264File();
 
-	bool Open(const char *path);
+	bool Open (const char *path);
 	void Close();
 
 	bool IsOpened() const { return (m_file != NULL); }
@@ -29,94 +29,6 @@ private:
 	int  m_count = 0;
 };
 //}}}
-
-void SendFrameThread (xop::RtspServer* rtsp_server, xop::MediaSessionId session_id, H264File* h264_file);
-
-//{{{
-int main (int argc, char** argv) {
-
-	if (argc != 2) {
-		printf ("Usage: %s test.h264 \n", argv[0]);
-		return 0;
-		}
-
-	H264File h264_file;
-	if(!h264_file.Open (argv[1])) {
-		printf ("Open %s failed.\n", argv[1]);
-		return 0;
-		}
-
-	std::string suffix = "live";
-	std::string ip = "127.0.0.1";
-	std::string port = "554";
-	std::string rtsp_url = "rtsp://" + ip + ":" + port + "/" + suffix;
-
-	std::shared_ptr<xop::EventLoop> event_loop (new xop::EventLoop());
-	std::shared_ptr<xop::RtspServer> server = xop::RtspServer::Create (event_loop.get());
-
-	if (!server->Start ("0.0.0.0", atoi (port.c_str()))) {
-		printf ("RTSP Server listen on %s failed.\n", port.c_str());
-		return 0;
-	}
-
-#ifdef AUTH_CONFIG
-	server->SetAuthConfig ("-_-", "admin", "12345");
-#endif
-
-	xop::MediaSession* session = xop::MediaSession::CreateNew ("live");
-	session->AddSource (xop::channel_0, xop::H264Source::CreateNew());
-	//session->StartMulticast();
-	session->AddNotifyConnectedCallback([] (xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port) {
-		printf ("RTSP client connect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
-		});
-
-	session->AddNotifyDisconnectedCallback([](xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port) {
-		printf ("RTSP client disconnect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
-		});
-
-	xop::MediaSessionId session_id = server->AddSession (session);
-
-	std::thread t1 (SendFrameThread, server.get(), session_id, &h264_file);
-	t1.detach();
-
-	std::cout << "Play URL: " << rtsp_url << std::endl;
-
-	while (1) {
-		xop::Timer::Sleep (100);
-		}
-
-	getchar();
-	return 0;
-	}
-//}}}
-
-//{{{
-void SendFrameThread (xop::RtspServer* rtsp_server, xop::MediaSessionId session_id, H264File* h264_file) {
-
-	int buf_size = 2000000;
-	std::unique_ptr<uint8_t> frame_buf (new uint8_t[buf_size]);
-
-	while(1) {
-		bool end_of_frame = false;
-		int frame_size = h264_file->ReadFrame ((char*)frame_buf.get(), buf_size, &end_of_frame);
-		if(frame_size > 0) {
-			xop::AVFrame videoFrame = {0};
-			videoFrame.type = 0;
-			videoFrame.size = frame_size;
-			videoFrame.timestamp = xop::H264Source::GetTimestamp();
-			videoFrame.buffer.reset (new uint8_t[videoFrame.size]);
-			memcpy (videoFrame.buffer.get(), frame_buf.get(), videoFrame.size);
-			rtsp_server->PushFrame (session_id, xop::channel_0, videoFrame);
-			}
-		else {
-			break;
-			}
-
-		xop::Timer::Sleep(40);
-		};
-	}
-//}}}
-
 //{{{
 H264File::H264File (int buf_size)
 		: m_buf_size(buf_size) {
@@ -124,7 +36,6 @@ H264File::H264File (int buf_size)
 	}
 //}}}
 H264File::~H264File() { delete [] m_buf; }
-
 //{{{
 bool H264File::Open (const char *path) {
 
@@ -234,5 +145,87 @@ int H264File::ReadFrame (char* in_buf, int in_buf_size, bool* end) {
 
 	fseek (m_file, m_bytes_used, SEEK_SET);
 	return size;
+	}
+//}}}
+
+//{{{
+void SendFrameThread (xop::RtspServer* rtsp_server, xop::MediaSessionId session_id, H264File* h264_file) {
+
+	int buf_size = 2000000;
+	std::unique_ptr<uint8_t> frame_buf (new uint8_t[buf_size]);
+
+	while (true) {
+		bool end_of_frame = false;
+		int frame_size = h264_file->ReadFrame ((char*)frame_buf.get(), buf_size, &end_of_frame);
+		if(frame_size > 0) {
+			xop::AVFrame videoFrame = {0};
+			videoFrame.type = 0;
+			videoFrame.size = frame_size;
+			videoFrame.timestamp = xop::H264Source::GetTimestamp();
+			videoFrame.buffer.reset (new uint8_t[videoFrame.size]);
+			memcpy (videoFrame.buffer.get(), frame_buf.get(), videoFrame.size);
+			rtsp_server->PushFrame (session_id, xop::channel_0, videoFrame);
+			}
+		else 
+			break;
+
+		xop::Timer::Sleep(40);
+		};
+	}
+//}}}
+//{{{
+int main (int argc, char** argv) {
+
+	if (argc != 2) {
+		printf ("Usage: %s test.h264 \n", argv[0]);
+		return 0;
+		}
+
+	H264File h264_file;
+	if(!h264_file.Open (argv[1])) {
+		printf ("Open %s failed.\n", argv[1]);
+		return 0;
+		}
+
+	std::string suffix = "live";
+	std::string ip = "127.0.0.1";
+	std::string port = "554";
+	std::string rtsp_url = "rtsp://" + ip + ":" + port + "/" + suffix;
+
+	std::shared_ptr<xop::EventLoop> event_loop (new xop::EventLoop());
+	std::shared_ptr<xop::RtspServer> server = xop::RtspServer::Create (event_loop.get());
+
+	if (!server->Start ("0.0.0.0", atoi (port.c_str()))) {
+		printf ("RTSP Server listen on %s failed.\n", port.c_str());
+		return 0;
+	}
+
+	#ifdef AUTH_CONFIG
+		server->SetAuthConfig ("-_-", "admin", "12345");
+	#endif
+
+	xop::MediaSession* session = xop::MediaSession::CreateNew ("live");
+	session->AddSource (xop::channel_0, xop::H264Source::CreateNew());
+	//session->StartMulticast();
+	session->AddNotifyConnectedCallback([] (xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port) {
+		printf ("RTSP client connect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
+		});
+
+	session->AddNotifyDisconnectedCallback([](xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port) {
+		printf ("RTSP client disconnect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
+		});
+
+	xop::MediaSessionId session_id = server->AddSession (session);
+
+	std::thread t1 (SendFrameThread, server.get(), session_id, &h264_file);
+	t1.detach();
+
+	std::cout << "Play URL: " << rtsp_url << std::endl;
+
+	while (true)
+		xop::Timer::Sleep (100);
+
+	getchar();
+	return 0;
 	}
 //}}}
