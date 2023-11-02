@@ -1,4 +1,3 @@
-// PHZ 2018-5-15
 //{{{  includes
 #if defined(WIN32) || defined(_WIN32)
   #ifndef _CRT_SECURE_NO_WARNINGS
@@ -31,10 +30,9 @@ void Logger::Init (char *pathname) {
   std::unique_lock<std::mutex> lock(mutex_);
 
   if (pathname != nullptr) {
-    ofs_.open(pathname, std::ios::out | std::ios::binary);
-    if (ofs_.fail()) {
+    ofs_.open (pathname, std::ios::out | std::ios::binary);
+    if (ofs_.fail())
       std::cerr << "Failed to open logfile." << std::endl;
-      }
     }
   }
 //}}}
@@ -85,9 +83,8 @@ void Logger::Log2 (Priority priority, const char *fmt, ...) {
 //{{{
 void Logger::Write (std::string info) {
 
-  if (ofs_.is_open()) {
+  if (ofs_.is_open())
     ofs_ << "[" << Timestamp::Localtime() << "]" << info << std::endl;
-    }
 
   std::cout << "[" << Timestamp::Localtime() << "]" << info << std::endl;
   }

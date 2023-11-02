@@ -155,7 +155,7 @@ void SendFrameThread (xop::RtspServer* rtsp_server, xop::MediaSessionId session_
   while (true) {
     bool end_of_frame = false;
     int frame_size = h264_file->ReadFrame ((char*)frame_buf.get(), buf_size, &end_of_frame);
-    //LOG_INFO("frame size:%d", frame_size);
+    logInfo("frame size:%d", frame_size);
     if (frame_size > 0) {
       xop::AVFrame videoFrame = {0};
       videoFrame.type = 0;
@@ -194,7 +194,7 @@ int main (int argc, char** argv) {
   std::shared_ptr<xop::EventLoop> event_loop (new xop::EventLoop());
   std::shared_ptr<xop::RtspServer> server = xop::RtspServer::Create (event_loop.get());
 
-  if (!server->Start ("0.0.0.0", atoi (port.c_str()))) {
+  if (!server->Start ("0.0.0.0", (uint16_t)atoi (port.c_str()))) {
     printf ("RTSP Server listen on %s failed.\n", port.c_str());
     return 0;
     }

@@ -1,4 +1,3 @@
-// PHZ 2020-5-15
 #pragma once
 //{{{  includes
 #include <string>
@@ -16,16 +15,17 @@ namespace xop {
 
   class Logger {
   public:
-    Logger &operator=(const Logger&) = delete;
-    Logger (const Logger&) = delete;
     static Logger& Instance();
+
+    Logger &operator = (const Logger&) = delete;
+    Logger (const Logger&) = delete;
     ~Logger();
 
     void Init (char* pathname = nullptr);
     void Exit();
 
-    void Log (Priority priority, const char* __file, const char* __func, int __line, const char *fmt, ...);
-    void Log2 (Priority priority, const char *fmt, ...);
+    void Log (Priority priority, const char* __file, const char* __func, int __line, const char* fmt, ...);
+    void Log2 (Priority priority, const char* fmt, ...);
 
   private:
     void Write (std::string buf);
@@ -37,10 +37,10 @@ namespace xop {
   }
 
 #ifdef _DEBUG
-  #define LOG_DEBUG(fmt, ...) xop::Logger::Instance().Log (LOG_DEBUG, __FILE__, __FUNCTION__,__LINE__, fmt, ##__VA_ARGS__)
+  #define logDebug(fmt, ...) xop::Logger::Instance().Log (xop::LOG_DEBUG, __FILE__, __FUNCTION__,__LINE__, fmt, ##__VA_ARGS__)
 #else
-  #define LOG_DEBUG(fmt, ...)
+  #define logDebug(fmt, ...)
 #endif
 
-#define LOG_INFO(fmt, ...) xop::Logger::Instance().Log2 (LOG_INFO, fmt, ##__VA_ARGS__)
-#define LOG_ERROR(fmt, ...) xop::Logger::Instance().Log (LOG_ERROR, __FILE__, __FUNCTION__,__LINE__, fmt, ##__VA_ARGS__)
+#define logInfo(fmt, ...) xop::Logger::Instance().Log2 (xop::LOG_INFO, fmt, ##__VA_ARGS__)
+#define logError(fmt, ...) xop::Logger::Instance().Log (xop::LOG_ERROR, __FILE__, __FUNCTION__,__LINE__, fmt, ##__VA_ARGS__)

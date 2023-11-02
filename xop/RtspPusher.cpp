@@ -68,7 +68,7 @@ int RtspPusher::OpenUrl (std::string url, int msec)
   timestamp.Reset();
 
   if (!this->ParseRtspUrl(url)) {
-    LOG_ERROR ("rtsp url(%s) was illegal.\n", url.c_str());
+    logError ("rtsp url(%s) was illegal.\n", url.c_str());
     return -1;
   }
 

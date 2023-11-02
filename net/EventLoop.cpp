@@ -1,4 +1,3 @@
-// PHZ 2019-10-18
 //{{{  includes
 #include "EventLoop.h"
 
@@ -11,7 +10,6 @@
   #pragma comment(lib,"Iphlpapi.lib")
 #endif
 //}}}
-
 using namespace xop;
 
 //{{{

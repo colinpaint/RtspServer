@@ -1,5 +1,3 @@
-// PHZ
-// 2018-5-15
 #pragma once
 
 #if defined(__linux) || defined(__linux__)

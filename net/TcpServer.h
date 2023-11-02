@@ -1,7 +1,4 @@
-// PHZ
-// 2018-11-10
 #pragma once
-
 //{{{  includes
 #include <memory>
 #include <string>

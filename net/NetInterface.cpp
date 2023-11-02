@@ -1,4 +1,3 @@
-// PHZ 2018-5-15
 //{{{  includes
 #include "NetInterface.h"
 #include "Socket.h"
@@ -13,7 +12,8 @@ std::string NetInterface::GetLocalIPAddress() {
     char buf[512] = { 0 };
     struct ifconf ifconf;
     struct ifreq  *ifreq;
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+
+    sockfd = socket (AF_INET, SOCK_DGRAM, 0);
     if (sockfd == INVALID_SOCKET) {
       close (sockfd);
       return "0.0.0.0";
@@ -21,8 +21,8 @@ std::string NetInterface::GetLocalIPAddress() {
 
     ifconf.ifc_len = 512;
     ifconf.ifc_buf = buf;
-    if (ioctl(sockfd, SIOCGIFCONF, &ifconf) < 0) {
-      close(sockfd);
+    if (ioctl (sockfd, SIOCGIFCONF, &ifconf) < 0) {
+      close (sockfd);
       return "0.0.0.0";
       }
 
@@ -31,8 +31,8 @@ std::string NetInterface::GetLocalIPAddress() {
     ifreq = (struct ifreq*)ifconf.ifc_buf;
     for (int i = (ifconf.ifc_len / sizeof(struct ifreq)); i>0; i--) {
       if (ifreq->ifr_flags == AF_INET) {
-        if (strcmp(ifreq->ifr_name, "lo") != 0) {
-          return inet_ntoa(((struct sockaddr_in*)&(ifreq->ifr_addr))->sin_addr);
+        if (strcmp (ifreq->ifr_name, "lo") != 0) {
+          return inet_ntoa (((struct sockaddr_in*)&(ifreq->ifr_addr))->sin_addr);
           }
         ifreq++;
         }
@@ -58,22 +58,25 @@ std::string NetInterface::GetLocalIPAddress() {
       }
 
     while (pIpAdapterInfo) {
-      IP_ADDR_STRING *pIpAddrString = &(pIpAdapterInfo->IpAddressList);
-      while(pIpAddrString) {
-        if (strcmp(pIpAddrString->IpAddress.String, "127.0.0.1")!=0
-            && strcmp(pIpAddrString->IpAddress.String, "0.0.0.0")!=0) {
+      IP_ADDR_STRING* pIpAddrString = &(pIpAdapterInfo->IpAddressList);
+      while (pIpAddrString) {
+        if (strcmp (pIpAddrString->IpAddress.String, "127.0.0.1") != 0
+            && strcmp(pIpAddrString->IpAddress.String, "0.0.0.0") != 0) {
           // pIpAddrString->IpMask.String
           //pIpAdapterInfo->GatewayList.IpAddress.String
-          std::string ip(pIpAddrString->IpAddress.String);
+          std::string ip (pIpAddrString->IpAddress.String);
           //delete pIpAdapterInfo;
           return ip;
           }
+
         pIpAddrString = pIpAddrString->Next;
         } while (pIpAddrString);
+
       pIpAdapterInfo = pIpAdapterInfo->Next;
       }
 
     delete pIpAdapterInfo;
+
     return "0.0.0.0";
     //}}}
   #else

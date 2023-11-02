@@ -1,4 +1,3 @@
-// PHZ 2018-6-10
 //{{{  includes
 #if defined(WIN32) || defined(_WIN32)
   #ifndef _CRT_SECURE_NO_WARNINGS
@@ -101,7 +100,7 @@ bool AACSource::HandleFrame(MediaChannelId channel_id, AVFrame frame) {
   char AU[AU_SIZE] = { 0 };
   AU[0] = 0x00;
   AU[1] = 0x10;
-  AU[2] = (frame_size & 0x1fe0) >> 5;
+  AU[2] = (char)((frame_size & 0x1fe0) >> 5);
   AU[3] = (frame_size & 0x1f) << 3;
 
   RtpPacket rtp_pkt;

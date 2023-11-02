@@ -1,4 +1,3 @@
-// PHZ 2018-5-15
 //{{{  includes
 #include "SocketUtil.h"
 #include "Socket.h"
@@ -72,7 +71,7 @@ void SocketUtil::SetReusePort (SOCKET sockfd) {
 
   #ifdef SO_REUSEPORT
     int on = 1;
-    setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on));
+    setsockopt (sockfd, SOL_SOCKET, SO_REUSEPORT, (const char*)&on, sizeof(on));
   #endif
   }
 //}}}
@@ -82,7 +81,7 @@ void SocketUtil::SetNoDelay (SOCKET sockfd) {
 
   #ifdef TCP_NODELAY
     int on = 1;
-    int ret = setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (char *)&on, sizeof(on));
+    setsockopt (sockfd, IPPROTO_TCP, TCP_NODELAY, (char *)&on, sizeof(on));
   #endif
   }
 //}}}
