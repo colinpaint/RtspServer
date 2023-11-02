@@ -1,7 +1,8 @@
 // PHZ 2018-6-10
+//{{{  includes
 #include "DigestAuthentication.h"
-#include "md5/md5.hpp"
-
+#include "md5.hpp"
+//}}}
 using namespace xop;
 
 //{{{
