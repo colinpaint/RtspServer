@@ -155,7 +155,7 @@ std::string MediaSession::GetSdpMessage (std::string ip, std::string session_nam
     snprintf (buf+strlen(buf), sizeof(buf)-strlen(buf),
               "s=%s\r\n", session_name.c_str());
 
-  if(is_multicast_) 
+  if(is_multicast_)
     snprintf (buf+strlen(buf), sizeof(buf)-strlen(buf),
               "a=type:broadcast\r\n"
               "a=rtcp-unicast: reflection\r\n");
@@ -169,7 +169,7 @@ std::string MediaSession::GetSdpMessage (std::string ip, std::string session_nam
         snprintf (buf+strlen(buf), sizeof(buf)-strlen(buf),
                   "c=IN IP4 %s/255\r\n", multicast_ip_.c_str());
         }
-      else 
+      else
         snprintf (buf+strlen(buf), sizeof(buf)-strlen(buf),
                   "%s\r\n", media_sources_[chn]->GetMediaDescription(0).c_str());
 

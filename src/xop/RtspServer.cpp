@@ -41,10 +41,10 @@ void RtspServer::RemoveSession (MediaSessionId sessionId) {
 
   std::lock_guard<std::mutex> locker(mutex_);
 
-  auto iter = media_sessions_.find(sessionId);
+  auto iter = media_sessions_.find (sessionId);
   if (iter != media_sessions_.end()) {
-    rtsp_suffix_map_.erase(iter->second->GetRtspUrlSuffix());
-    media_sessions_.erase(sessionId);
+    rtsp_suffix_map_.erase (iter->second->GetRtspUrlSuffix());
+    media_sessions_.erase (sessionId);
     }
   }
 //}}}
@@ -64,17 +64,17 @@ MediaSession::Ptr RtspServer::LookMediaSession (const std::string& suffix) {
   }
 //}}}
 //{{{
-MediaSession::Ptr RtspServer::LookMediaSession (MediaSessionId session_Id)
-{
-    std::lock_guard<std::mutex> locker(mutex_);
+MediaSession::Ptr RtspServer::LookMediaSession (MediaSessionId session_Id) {
 
-    auto iter = media_sessions_.find(session_Id);
-    if(iter != media_sessions_.end()) {
-        return iter->second;
+  std::lock_guard<std::mutex> locker(mutex_);
+
+  auto iter = media_sessions_.find (session_Id);
+  if (iter != media_sessions_.end()) {
+    return iter->second;
     }
 
-    return nullptr;
-}
+  return nullptr;
+  }
 //}}}
 
 //{{{
@@ -91,7 +91,7 @@ bool RtspServer::PushFrame (MediaSessionId session_id, MediaChannelId channel_id
       return false;
   }
 
-  if (sessionPtr!=nullptr && sessionPtr->GetNumClient()!=0)
+  if (sessionPtr != nullptr && sessionPtr->GetNumClient() != 0)
     return sessionPtr->HandleFrame (channel_id, frame);
 
   return false;

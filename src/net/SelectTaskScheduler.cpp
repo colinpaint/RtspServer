@@ -1,5 +1,4 @@
-// PHZ
-// 2018-5-15
+// PHZ 2018-5-15
 //{{{  includes
 #include "SelectTaskScheduler.h"
 #include "Logger.h"

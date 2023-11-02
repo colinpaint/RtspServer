@@ -8,7 +8,7 @@ using namespace std;
 using namespace xop;
 
 //{{{
-RtpConnection::RtpConnection(std::weak_ptr<TcpConnection> rtsp_connection)
+RtpConnection::RtpConnection (std::weak_ptr<TcpConnection> rtsp_connection)
     : rtsp_connection_(rtsp_connection) {
 
   std::random_device rd;
@@ -27,7 +27,7 @@ RtpConnection::RtpConnection(std::weak_ptr<TcpConnection> rtsp_connection)
   auto conn = rtsp_connection_.lock();
   rtsp_ip_ = conn->GetIp();
   rtsp_port_ = conn->GetPort();
-}
+  }
 //}}}
 //{{{
 RtpConnection::~RtpConnection() {
@@ -76,7 +76,7 @@ bool RtpConnection::SetupRtpOverTcp (MediaChannelId channel_id, uint16_t rtp_cha
   }
 //}}}
 //{{{
-bool RtpConnection::SetupRtpOverUdp (MediaChannelId channel_id, uint16_t rtp_port, uint16_t rtcp_port) { 
+bool RtpConnection::SetupRtpOverUdp (MediaChannelId channel_id, uint16_t rtp_port, uint16_t rtcp_port) {
 
   auto conn = rtsp_connection_.lock();
   if (!conn) {
@@ -132,10 +132,10 @@ bool RtpConnection::SetupRtpOverUdp (MediaChannelId channel_id, uint16_t rtp_por
   }
 //}}}
 //{{{
-bool RtpConnection::SetupRtpOverMulticast (MediaChannelId channel_id, std::string ip, uint16_t port)
-{
-    std::random_device rd;
-    for (int n = 0; n <= 10; n++) {
+bool RtpConnection::SetupRtpOverMulticast (MediaChannelId channel_id, std::string ip, uint16_t port) {
+
+  std::random_device rd;
+  for (int n = 0; n <= 10; n++) {
     if (n == 10) {
       return false;
       }
@@ -159,14 +159,15 @@ bool RtpConnection::SetupRtpOverMulticast (MediaChannelId channel_id, std::strin
   media_channel_info_[channel_id].is_setup = true;
   transport_mode_ = RTP_OVER_MULTICAST;
   is_multicast_ = true;
+
   return true;
   }
 //}}}
 
 //{{{
-void RtpConnection::Play()
-{
-  for(int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
+void RtpConnection::Play() {
+
+  for (int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
     if (media_channel_info_[chn].is_setup) {
       media_channel_info_[chn].is_play = true;
       }
@@ -243,7 +244,7 @@ void RtpConnection::SetFrameType (uint8_t frame_type) {
 //{{{
 void RtpConnection::SetRtpHeader (MediaChannelId channel_id, RtpPacket pkt) {
 
-  if((media_channel_info_[channel_id].is_play || media_channel_info_[channel_id].is_record) && has_key_frame_) {
+  if ((media_channel_info_[channel_id].is_play || media_channel_info_[channel_id].is_record) && has_key_frame_) {
     media_channel_info_[channel_id].rtp_header.marker = pkt.last;
     media_channel_info_[channel_id].rtp_header.ts = htonl(pkt.timestamp);
     media_channel_info_[channel_id].rtp_header.seq = htons(media_channel_info_[channel_id].packet_seq++);
@@ -251,6 +252,7 @@ void RtpConnection::SetRtpHeader (MediaChannelId channel_id, RtpPacket pkt) {
     }
   }
 //}}}
+
 //{{{
 int RtpConnection::SendRtpPacket (MediaChannelId channel_id, RtpPacket pkt) {
 
@@ -305,8 +307,8 @@ int RtpConnection::SendRtpOverTcp (MediaChannelId channel_id, RtpPacket pkt) {
 //{{{
 int RtpConnection::SendRtpOverUdp (MediaChannelId channel_id, RtpPacket pkt) {
 
-  int ret = sendto(rtpfd_[channel_id], (const char*)pkt.data.get()+4, pkt.size-4, 0,
-          (struct sockaddr *)&(peer_rtp_addr_[channel_id]), sizeof(struct sockaddr_in));
+  int ret = sendto (rtpfd_[channel_id], (const char*)pkt.data.get()+4, pkt.size-4, 0,
+                    (struct sockaddr *)&(peer_rtp_addr_[channel_id]), sizeof(struct sockaddr_in));
 
   if(ret < 0) {
     Teardown();

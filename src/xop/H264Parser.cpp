@@ -5,7 +5,7 @@
 //}}}
 using namespace xop;
 
-Nal H264Parser::findNal(const uint8_t *data, uint32_t size) {
+Nal H264Parser::findNal (const uint8_t* data, uint32_t size) {
 
   Nal nal(nullptr, nullptr);
   if (size < 5)

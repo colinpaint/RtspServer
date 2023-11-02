@@ -7,7 +7,7 @@ using namespace std;
 using namespace std::chrono;
 
 //{{{
-TimerId TimerQueue::AddTimer(const TimerEvent& event, uint32_t ms)
+TimerId TimerQueue::AddTimer (const TimerEvent& event, uint32_t ms)
 {
   std::lock_guard<std::mutex> locker(mutex_);
 
@@ -22,7 +22,7 @@ TimerId TimerQueue::AddTimer(const TimerEvent& event, uint32_t ms)
 }
 //}}}
 //{{{
-void TimerQueue::RemoveTimer(TimerId timerId)
+void TimerQueue::RemoveTimer (TimerId timerId)
 {
   std::lock_guard<std::mutex> locker(mutex_);
 

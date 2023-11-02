@@ -5,7 +5,7 @@
 using namespace xop;
 
 //{{{
-DigestAuthentication::DigestAuthentication(std::string realm, std::string username, std::string password)
+DigestAuthentication::DigestAuthentication (std::string realm, std::string username, std::string password)
   : realm_(realm)
   , username_(username)
   , password_(password)
@@ -27,7 +27,7 @@ std::string DigestAuthentication::GetNonce()
 }
 //}}}
 //{{{
-std::string DigestAuthentication::GetResponse(std::string nonce, std::string cmd, std::string url)
+std::string DigestAuthentication::GetResponse (std::string nonce, std::string cmd, std::string url)
 {
   //md5(md5(<username>:<realm> : <password>) :<nonce> : md5(<cmd>:<url>))
 

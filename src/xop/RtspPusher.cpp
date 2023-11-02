@@ -10,7 +10,7 @@
 using namespace xop;
 
 //{{{
-RtspPusher::RtspPusher(xop::EventLoop *event_loop)
+RtspPusher::RtspPusher (xop::EventLoop *event_loop)
   : event_loop_(event_loop)
 {
 
@@ -32,14 +32,14 @@ std::shared_ptr<RtspPusher> RtspPusher::Create(xop::EventLoop* loop)
 //}}}
 
 //{{{
-void RtspPusher::AddSession(MediaSession* session)
+void RtspPusher::AddSession (MediaSession* session)
 {
     std::lock_guard<std::mutex> locker(mutex_);
     media_session_.reset(session);
 }
 //}}}
 //{{{
-void RtspPusher::RemoveSession(MediaSessionId sessionId)
+void RtspPusher::RemoveSession (MediaSessionId sessionId)
 {
   std::lock_guard<std::mutex> locker(mutex_);
   media_session_ = nullptr;
@@ -47,7 +47,7 @@ void RtspPusher::RemoveSession(MediaSessionId sessionId)
 //}}}
 
 //{{{
-MediaSession::Ptr RtspPusher::LookMediaSession(MediaSessionId session_id)
+MediaSession::Ptr RtspPusher::LookMediaSession (MediaSessionId session_id)
 {
   return media_session_;
 }
@@ -55,7 +55,7 @@ MediaSession::Ptr RtspPusher::LookMediaSession(MediaSessionId session_id)
 
 //{{{
 
-int RtspPusher::OpenUrl(std::string url, int msec)
+int RtspPusher::OpenUrl (std::string url, int msec)
 {
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -68,7 +68,7 @@ int RtspPusher::OpenUrl(std::string url, int msec)
   timestamp.Reset();
 
   if (!this->ParseRtspUrl(url)) {
-    LOG_ERROR("rtsp url(%s) was illegal.\n", url.c_str());
+    LOG_ERROR ("rtsp url(%s) was illegal.\n", url.c_str());
     return -1;
   }
 
@@ -148,7 +148,7 @@ bool RtspPusher::IsConnected()
 //}}}
 
 //{{{
-bool RtspPusher::PushFrame(MediaChannelId channelId, AVFrame frame)
+bool RtspPusher::PushFrame (MediaChannelId channelId, AVFrame frame)
 {
   std::lock_guard<std::mutex> locker(mutex_);
   if (!media_session_ || !rtsp_conn_) {

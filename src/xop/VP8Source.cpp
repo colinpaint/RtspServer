@@ -18,7 +18,7 @@ using namespace xop;
 using namespace std;
 
 //{{{
-VP8Source::VP8Source(uint32_t framerate)
+VP8Source::VP8Source (uint32_t framerate)
     : framerate_(framerate)
 {
     payload_ = 96;
@@ -26,7 +26,7 @@ VP8Source::VP8Source(uint32_t framerate)
 }
 //}}}
 //{{{
-VP8Source* VP8Source::CreateNew(uint32_t framerate)
+VP8Source* VP8Source::CreateNew (uint32_t framerate)
 {
     return new VP8Source(framerate);
 }
@@ -39,7 +39,7 @@ VP8Source::~VP8Source()
 //}}}
 
 //{{{
-string VP8Source::GetMediaDescription(uint16_t port)
+string VP8Source::GetMediaDescription (uint16_t port)
 {
     char buf[100] = { 0 };
     sprintf(buf, "m=video %hu RTP/AVP 96", port);
@@ -53,7 +53,7 @@ string VP8Source::GetAttribute()
 }
 //}}}
 //{{{
-bool VP8Source::HandleFrame(MediaChannelId channel_id, AVFrame frame)
+bool VP8Source::HandleFrame (MediaChannelId channel_id, AVFrame frame)
 {
     uint8_t* frame_buf = frame.buffer.get();
     uint32_t frame_size = frame.size;

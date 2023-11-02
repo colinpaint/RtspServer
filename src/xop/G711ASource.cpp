@@ -37,7 +37,7 @@ G711ASource::~G711ASource()
 //}}}
 
 //{{{
-string G711ASource::GetMediaDescription(uint16_t port)
+string G711ASource::GetMediaDescription (uint16_t port)
 {
   char buf[100] = {0};
   sprintf(buf, "m=audio %hu RTP/AVP 8", port);
@@ -52,7 +52,7 @@ string G711ASource::GetAttribute()
 //}}}
 
 //{{{
-bool G711ASource::HandleFrame(MediaChannelId channel_id, AVFrame frame)
+bool G711ASource::HandleFrame (MediaChannelId channel_id, AVFrame frame)
 {
   if (frame.size > MAX_RTP_PAYLOAD_SIZE) {
     return false;

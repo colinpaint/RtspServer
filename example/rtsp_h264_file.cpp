@@ -2,6 +2,7 @@
 //{{{  includes
 #include "xop/RtspServer.h"
 #include "net/Timer.h"
+#include "net/Logger.h"
 #include <thread>
 #include <memory>
 #include <iostream>
@@ -150,7 +151,8 @@ void SendFrameThread (xop::RtspServer* rtsp_server, xop::MediaSessionId session_
   while (true) {
     bool end_of_frame = false;
     int frame_size = h264_file->ReadFrame ((char*)frame_buf.get(), buf_size, &end_of_frame);
-    if(frame_size > 0) {
+    //LOG_INFO("frame size:%d", frame_size);
+    if (frame_size > 0) {
       xop::AVFrame videoFrame = {0};
       videoFrame.type = 0;
       videoFrame.size = frame_size;

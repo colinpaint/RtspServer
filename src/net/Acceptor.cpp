@@ -50,7 +50,6 @@ int Acceptor::Listen (std::string ip, uint16_t port)
   return 0;
 }
 //}}}
-
 //{{{
 void Acceptor::Close()
 {

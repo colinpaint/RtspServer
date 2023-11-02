@@ -8,7 +8,7 @@
 using namespace xop;
 
 //{{{
-void xop::WriteUint32BE(char* p, uint32_t value)
+void xop::WriteUint32BE (char* p, uint32_t value)
 {
   p[0] = value >> 24;
   p[1] = value >> 16;
@@ -17,7 +17,7 @@ void xop::WriteUint32BE(char* p, uint32_t value)
 }
 //}}}
 //{{{
-void xop::WriteUint32LE(char* p, uint32_t value)
+void xop::WriteUint32LE (char* p, uint32_t value)
 {
   p[0] = value & 0xff;
   p[1] = value >> 8;
@@ -26,7 +26,7 @@ void xop::WriteUint32LE(char* p, uint32_t value)
 }
 //}}}
 //{{{
-void xop::WriteUint24BE(char* p, uint32_t value)
+void xop::WriteUint24BE (char* p, uint32_t value)
 {
   p[0] = value >> 16;
   p[1] = value >> 8;
@@ -34,7 +34,7 @@ void xop::WriteUint24BE(char* p, uint32_t value)
 }
 //}}}
 //{{{
-void xop::WriteUint24LE(char* p, uint32_t value)
+void xop::WriteUint24LE (char* p, uint32_t value)
 {
   p[0] = value & 0xff;
   p[1] = value >> 8;
@@ -42,14 +42,14 @@ void xop::WriteUint24LE(char* p, uint32_t value)
 }
 //}}}
 //{{{
-void xop::WriteUint16BE(char* p, uint16_t value)
+void xop::WriteUint16BE (char* p, uint16_t value)
 {
   p[0] = value >> 8;
   p[1] = value & 0xff;
 }
 //}}}
 //{{{
-void xop::WriteUint16LE(char* p, uint16_t value)
+void xop::WriteUint16LE (char* p, uint16_t value)
 {
   p[0] = value & 0xff;
   p[1] = value >> 8;
@@ -57,7 +57,7 @@ void xop::WriteUint16LE(char* p, uint16_t value)
 //}}}
 
 //{{{
-BufferWriter::BufferWriter(int capacity)
+BufferWriter::BufferWriter (int capacity)
   : max_queue_length_(capacity)
 {
 
@@ -65,7 +65,7 @@ BufferWriter::BufferWriter(int capacity)
 //}}}
 
 //{{{
-bool BufferWriter::Append(std::shared_ptr<char> data, uint32_t size, uint32_t index)
+bool BufferWriter::Append (std::shared_ptr<char> data, uint32_t size, uint32_t index)
 {
   if (size <= index) {
     return false;
@@ -81,7 +81,7 @@ bool BufferWriter::Append(std::shared_ptr<char> data, uint32_t size, uint32_t in
 }
 //}}}
 //{{{
-bool BufferWriter::Append(const char* data, uint32_t size, uint32_t index)
+bool BufferWriter::Append (const char* data, uint32_t size, uint32_t index)
 {
   if (size <= index) {
     return false;
@@ -101,7 +101,7 @@ bool BufferWriter::Append(const char* data, uint32_t size, uint32_t index)
 }
 //}}}
 //{{{
-int BufferWriter::Send(SOCKET sockfd, int timeout)
+int BufferWriter::Send (SOCKET sockfd, int timeout)
 {
   if (timeout > 0) {
     SocketUtil::SetBlock(sockfd, timeout);

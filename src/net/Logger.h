@@ -1,10 +1,10 @@
-// PHZ
-// 2020-5-15
+// PHZ 2020-5-15
 #pragma once
 //{{{  includes
 #include <string>
 #include <mutex>
 #include <thread>
+
 #include <fstream>
 #include <cstring>
 #include <iostream>
@@ -12,17 +12,16 @@
 //}}}
 
 namespace xop {
-
   enum Priority { LOG_DEBUG, LOG_STATE, LOG_INFO, LOG_WARNING, LOG_ERROR, };
 
   class Logger {
   public:
-    Logger &operator=(const Logger &) = delete;
-    Logger (const Logger &) = delete;
+    Logger &operator=(const Logger&) = delete;
+    Logger (const Logger&) = delete;
     static Logger& Instance();
     ~Logger();
 
-    void Init (char *pathname = nullptr);
+    void Init (char* pathname = nullptr);
     void Exit();
 
     void Log (Priority priority, const char* __file, const char* __func, int __line, const char *fmt, ...);
@@ -38,10 +37,10 @@ namespace xop {
   }
 
 #ifdef _DEBUG
-  #define LOG_DEBUG(fmt, ...) xop::Logger::Instance().Log(LOG_DEBUG, __FILE__, __FUNCTION__,__LINE__, fmt, ##__VA_ARGS__)
+  #define LOG_DEBUG(fmt, ...) xop::Logger::Instance().Log (LOG_DEBUG, __FILE__, __FUNCTION__,__LINE__, fmt, ##__VA_ARGS__)
 #else
   #define LOG_DEBUG(fmt, ...)
 #endif
 
-#define LOG_INFO(fmt, ...) xop::Logger::Instance().Log2(LOG_INFO, fmt, ##__VA_ARGS__)
-#define LOG_ERROR(fmt, ...) xop::Logger::Instance().Log(LOG_ERROR, __FILE__, __FUNCTION__,__LINE__, fmt, ##__VA_ARGS__)
+#define LOG_INFO(fmt, ...) xop::Logger::Instance().Log2 (LOG_INFO, fmt, ##__VA_ARGS__)
+#define LOG_ERROR(fmt, ...) xop::Logger::Instance().Log (LOG_ERROR, __FILE__, __FUNCTION__,__LINE__, fmt, ##__VA_ARGS__)

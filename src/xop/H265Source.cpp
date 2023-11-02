@@ -18,7 +18,7 @@ using namespace xop;
 using namespace std;
 
 //{{{
-H265Source::H265Source(uint32_t framerate)
+H265Source::H265Source (uint32_t framerate)
     : framerate_(framerate) {
 
   payload_    = 96;
@@ -26,11 +26,11 @@ H265Source::H265Source(uint32_t framerate)
   clock_rate_ = 90000;
   }
 //}}}
-H265Source* H265Source::CreateNew(uint32_t framerate) { return new H265Source(framerate); }
+H265Source* H265Source::CreateNew (uint32_t framerate) { return new H265Source(framerate); }
 H265Source::~H265Source() { }
 
 //{{{
-string H265Source::GetMediaDescription(uint16_t port) {
+string H265Source::GetMediaDescription (uint16_t port) {
 
   char buf[100] = {0};
   sprintf(buf, "m=video %hu RTP/AVP 96", port);
@@ -40,7 +40,7 @@ string H265Source::GetMediaDescription(uint16_t port) {
 string H265Source::GetAttribute() { return string("a=rtpmap:96 H265/90000"); }
 
 //{{{
-bool H265Source::HandleFrame(MediaChannelId channelId, AVFrame frame) {
+bool H265Source::HandleFrame (MediaChannelId channelId, AVFrame frame) {
 
   uint8_t *frame_buf  = frame.buffer.get();
   uint32_t frame_size = frame.size;

@@ -11,7 +11,7 @@
 using namespace xop;
 
 //{{{
-EpollTaskScheduler::EpollTaskScheduler(int id)
+EpollTaskScheduler::EpollTaskScheduler (int id)
   : TaskScheduler(id)
 {
 #if defined(__linux) || defined(__linux__)
@@ -33,9 +33,10 @@ EpollTaskScheduler::~EpollTaskScheduler()
 //}}}
 
 //{{{
-void EpollTaskScheduler::UpdateChannel(ChannelPtr channel)
-{
+void EpollTaskScheduler::UpdateChannel (ChannelPtr channel) {
+
   std::lock_guard<std::mutex> lock(mutex_);
+
 #if defined(__linux) || defined(__linux__)
   int fd = channel->GetSocket();
   if(channels_.find(fd) != channels_.end()) {
@@ -57,8 +58,8 @@ void EpollTaskScheduler::UpdateChannel(ChannelPtr channel)
 }
 //}}}
 //{{{
-void EpollTaskScheduler::Update(int operation, ChannelPtr& channel)
-{
+void EpollTaskScheduler::Update (int operation, ChannelPtr& channel) {
+
 #if defined(__linux) || defined(__linux__)
   struct epoll_event event = {0};
 
@@ -74,8 +75,8 @@ void EpollTaskScheduler::Update(int operation, ChannelPtr& channel)
 }
 //}}}
 //{{{
-void EpollTaskScheduler::RemoveChannel(ChannelPtr& channel)
-{
+void EpollTaskScheduler::RemoveChannel (ChannelPtr& channel) {
+
     std::lock_guard<std::mutex> lock(mutex_);
 #if defined(__linux) || defined(__linux__)
   int fd = channel->GetSocket();
@@ -89,8 +90,8 @@ void EpollTaskScheduler::RemoveChannel(ChannelPtr& channel)
 //}}}
 
 //{{{
-bool EpollTaskScheduler::HandleEvent(int timeout)
-{
+bool EpollTaskScheduler::HandleEvent (int timeout) {
+
 #if defined(__linux) || defined(__linux__)
   struct epoll_event events[512] = {0};
   int num_events = -1;

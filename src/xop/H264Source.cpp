@@ -29,10 +29,10 @@ H264Source* H264Source::CreateNew (uint32_t framerate) { return new H264Source(f
 H264Source::~H264Source() { }
 
 //{{{
-string H264Source::GetMediaDescription(uint16_t port) {
+string H264Source::GetMediaDescription (uint16_t port) {
 
   char buf[100] = {0};
-  sprintf(buf, "m=video %hu RTP/AVP 96", port); // \r\nb=AS:2000
+  sprintf (buf, "m=video %hu RTP/AVP 96", port); // \r\nb=AS:2000
   return string(buf);
   }
 //}}}
