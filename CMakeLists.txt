@@ -9,7 +9,7 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
 endif()
 #
 project (rtsp_h264 VERSION 1.0.0)
-  file (GLOB FILES rtsp_h264_file.cpp src/*.hpp src/*.cpp md5.hpp)
+  file (GLOB FILES rtsp_h264_file.cpp src/*.hpp src/*.cpp)
   add_executable (${PROJECT_NAME} ${FILES})
 
   target_include_directories (${PROJECT_NAME} PRIVATE . src)
