@@ -6,9 +6,10 @@ namespace xop {
   public:
     Pipe();
     virtual ~Pipe();
+
     bool Create();
-    int Write (void *buf, int len);
-    int Read( void *buf, int len);
+    int Write (void* buf, int len);
+    int Read( void* buf, int len);
     void  Close();
 
     SOCKET Read() const { return pipe_fd_[0]; }

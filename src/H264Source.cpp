@@ -6,8 +6,10 @@
 #endif
 
 #include "H264Source.h"
+
 #include <cstdio>
 #include <chrono>
+
 #if defined(__linux) || defined(__linux__)
   #include <sys/time.h>
 #endif
@@ -16,8 +18,7 @@ using namespace std;
 using namespace xop;
 
 //{{{
-H264Source::H264Source (uint32_t framerate)
-    : framerate_(framerate) {
+H264Source::H264Source (uint32_t framerate) : framerate_(framerate) {
 
   payload_    = 96;
   media_type_ = H264;

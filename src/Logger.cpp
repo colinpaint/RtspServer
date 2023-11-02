@@ -25,7 +25,7 @@ Logger& Logger::Instance() {
 Logger::~Logger() { }
 
 //{{{
-void Logger::Init (char *pathname) {
+void Logger::Init (char* pathname) {
 
   std::unique_lock<std::mutex> lock(mutex_);
 

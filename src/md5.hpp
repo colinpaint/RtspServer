@@ -84,27 +84,14 @@ namespace md5 {
   //{{{
   /* Define the state of the MD5 Algorithm. */
   typedef struct md5_state_s {
-      md5_word_t count[2];    /* message length in bits, lsw first */
-      md5_word_t abcd[4];     /* digest buffer */
-      md5_byte_t buf[64];     /* accumulate block */
-  } md5_state_t;
+    md5_word_t count[2];    /* message length in bits, lsw first */
+    md5_word_t abcd[4];     /* digest buffer */
+    md5_byte_t buf[64];     /* accumulate block */
+    } md5_state_t;
   //}}}
-
-  //{{{
-  /* Initialize the algorithm. */
-  inline void md5_init(md5_state_t *pms);
-  //}}}
-  //{{{
-  /* Append a string to the message. */
-  inline void md5_append(md5_state_t *pms, md5_byte_t const * data, size_t nbytes);
-  //}}}
-  //{{{
-  /* Finish the message and return the digest. */
-  inline void md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
-  //}}}
-
   //{{{  defines
   #undef ZSW_MD5_BYTE_ORDER   /* 1 = big-endian, -1 = little-endian, 0 = unknown */
+
   #ifdef ARCH_IS_BIG_ENDIAN
     #define ZSW_MD5_BYTE_ORDER (ARCH_IS_BIG_ENDIAN ? 1 : -1)
   #else
@@ -179,7 +166,7 @@ namespace md5 {
   //}}}
 
   //{{{
-  static void md5_process(md5_state_t *pms, md5_byte_t const * data /*[64]*/) {
+  static void md5_process (md5_state_t* pms, md5_byte_t const * data /*[64]*/) {
       md5_word_t
       a = pms->abcd[0], b = pms->abcd[1],
       c = pms->abcd[2], d = pms->abcd[3];
@@ -360,116 +347,123 @@ namespace md5 {
   }
   //}}}
   //{{{
-  void md5_init(md5_state_t *pms) {
-      pms->count[0] = pms->count[1] = 0;
-      pms->abcd[0] = 0x67452301;
-      pms->abcd[1] = /*0xefcdab89*/ ZSW_MD5_T_MASK ^ 0x10325476;
-      pms->abcd[2] = /*0x98badcfe*/ ZSW_MD5_T_MASK ^ 0x67452301;
-      pms->abcd[3] = 0x10325476;
-  }
+  void md5_init (md5_state_t* pms) {
+
+    pms->count[0] = pms->count[1] = 0;
+    pms->abcd[0] = 0x67452301;
+    pms->abcd[1] = /*0xefcdab89*/ ZSW_MD5_T_MASK ^ 0x10325476;
+    pms->abcd[2] = /*0x98badcfe*/ ZSW_MD5_T_MASK ^ 0x67452301;
+    pms->abcd[3] = 0x10325476;
+    }
   //}}}
   //{{{
-  void md5_append(md5_state_t *pms, md5_byte_t const * data, size_t nbytes) {
-      md5_byte_t const * p = data;
-      size_t left = nbytes;
-      int offset = (pms->count[0] >> 3) & 63;
-      md5_word_t nbits = (md5_word_t)(nbytes << 3);
+  void md5_append (md5_state_t* pms, md5_byte_t const * data, size_t nbytes) {
 
-      if (nbytes <= 0)
+    md5_byte_t const * p = data;
+    size_t left = nbytes;
+    int offset = (pms->count[0] >> 3) & 63;
+    md5_word_t nbits = (md5_word_t)(nbytes << 3);
+
+    if (nbytes <= 0)
       return;
 
-      /* Update the message length. */
-      pms->count[1] += (md5_word_t)(nbytes >> 29);
-      pms->count[0] += nbits;
-      if (pms->count[0] < nbits)
+    /* Update the message length. */
+    pms->count[1] += (md5_word_t)(nbytes >> 29);
+    pms->count[0] += nbits;
+    if (pms->count[0] < nbits)
       pms->count[1]++;
 
-      /* Process an initial partial block. */
-      if (offset) {
+    /* Process an initial partial block. */
+    if (offset) {
       int copy = (offset + nbytes > 64 ? 64 - offset : static_cast<int>(nbytes));
 
       std::memcpy(pms->buf + offset, p, copy);
       if (offset + copy < 64)
-          return;
+        return;
       p += copy;
       left -= copy;
       md5_process(pms, pms->buf);
       }
 
-      /* Process full blocks. */
-      for (; left >= 64; p += 64, left -= 64)
+    /* Process full blocks. */
+    for (; left >= 64; p += 64, left -= 64)
       md5_process(pms, p);
 
-      /* Process a final partial block. */
-      if (left)
+    /* Process a final partial block. */
+    if (left)
       std::memcpy(pms->buf, p, left);
-  }
+    }
   //}}}
   //{{{
-  void md5_finish(md5_state_t *pms, md5_byte_t digest[16]) {
-      static md5_byte_t const pad[64] = {
+  void md5_finish (md5_state_t* pms, md5_byte_t digest[16]) {
+
+    static md5_byte_t const pad[64] = {
       0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
       };
-      md5_byte_t data[8];
-      int i;
 
-      /* Save the length before padding. */
-      for (i = 0; i < 8; ++i)
+    md5_byte_t data[8];
+    int i;
+
+    /* Save the length before padding. */
+    for (i = 0; i < 8; ++i)
       data[i] = (md5_byte_t)(pms->count[i >> 2] >> ((i & 3) << 3));
-      /* Pad to 56 bytes mod 64. */
-      md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
-      /* Append the length. */
-      md5_append(pms, data, 8);
-      for (i = 0; i < 16; ++i)
+
+    /* Pad to 56 bytes mod 64. */
+    md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
+
+    /* Append the length. */
+    md5_append(pms, data, 8);
+    for (i = 0; i < 16; ++i)
       digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
-  }
+    }
   //}}}
   //{{{
   // some convenience c++ functions
-  inline std::string md5_hash_string(std::string const & s) {
-      char digest[16];
+  inline std::string md5_hash_string (std::string const& s) {
 
-      md5_state_t state;
+    char digest[16];
 
-      md5_init(&state);
-      md5_append(&state, (md5_byte_t const *)s.c_str(), s.size());
-      md5_finish(&state, (md5_byte_t *)digest);
+    md5_state_t state;
 
-      std::string ret;
-      ret.resize(16);
-      std::copy(digest,digest+16,ret.begin());
+    md5_init (&state);
+    md5_append (&state, (md5_byte_t const *)s.c_str(), s.size());
+    md5_finish (&state, (md5_byte_t *)digest);
 
-      return ret;
-  }
+    std::string ret;
+    ret.resize (16);
+    std::copy (digest,digest+16,ret.begin());
+
+    return ret;
+    }
   //}}}
 
   const char hexval[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
   //{{{
-  inline std::string md5_hash_hex(std::string const & input) {
-      std::string hash = md5_hash_string(input);
-      std::string hex;
+  inline std::string md5_hash_hex (std::string const& input) {
 
-      for (size_t i = 0; i < hash.size(); i++) {
-          hex.push_back(hexval[((hash[i] >> 4) & 0xF)]);
-          hex.push_back(hexval[(hash[i]) & 0x0F]);
+    std::string hash = md5_hash_string(input);
+    std::string hex;
+
+    for (size_t i = 0; i < hash.size(); i++) {
+      hex.push_back(hexval[((hash[i] >> 4) & 0xF)]);
+      hex.push_back(hexval[(hash[i]) & 0x0F]);
       }
 
-      return hex;
-  }
+    return hex;
+    }
   //}}}
   //{{{
-  inline std::string generate_nonce()
-  {
+  inline std::string generate_nonce() {
+
     std::random_device rd;
 
     auto timePoint = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
     uint32_t timestamp = (uint32_t)timePoint.time_since_epoch().count();
 
-    return md5_hash_hex(std::to_string(timestamp + rd()));
-  }
+    return md5_hash_hex (std::to_string(timestamp + rd()));
+    }
   //}}}
-
-  } // md5
+  }
