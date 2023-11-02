@@ -17,6 +17,8 @@ project (rtsp_h264 VERSION 1.0.0)
   message (STATUS "using ${CMAKE_HOST_SYSTEM_NAME}")
   if (CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
     target_compile_options (${PROJECT_NAME} PUBLIC /W4
+                                                   /wd4100
+                                                   #/wd4244 /wd4245 /wd4457 /wd4834 /wd4189
                                                    /fp:fast
                                                    ${BUILD_MSVC_COMPILE_OPTIONS})
     target_link_libraries (${PROJECT_NAME} PRIVATE ws2_32)

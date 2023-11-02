@@ -34,8 +34,8 @@ bool Pipe::Create()
   int again = 5;
 
   while(again--) {
-    port = rd();
-    if (rp.Bind("127.0.0.1", port)) {
+    port = (uint16_t)rd();
+    if (rp.Bind ("127.0.0.1", port)) {
       break;
     }
   }

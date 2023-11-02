@@ -1,8 +1,12 @@
 // RTSP H264 file server
 //{{{  includes
+#define _CRT_SECURE_NO_WARNINGS
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+
 #include "xop/RtspServer.h"
 #include "net/Timer.h"
 #include "net/Logger.h"
+
 #include <thread>
 #include <memory>
 #include <iostream>

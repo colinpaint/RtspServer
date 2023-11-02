@@ -39,18 +39,16 @@ std::shared_ptr<TaskScheduler> EventLoop::GetTaskScheduler()
   std::lock_guard<std::mutex> locker(mutex_);
   if (task_schedulers_.size() == 1) {
     return task_schedulers_.at(0);
-  }
+    }
   else {
     auto task_scheduler = task_schedulers_.at(index_);
     index_++;
     if (index_ >= task_schedulers_.size()) {
       index_ = 1;
-    }
+      }
     return task_scheduler;
+    }
   }
-
-  return nullptr;
-}
 //}}}
 
 //{{{
@@ -71,8 +69,9 @@ void EventLoop::Loop()
 #endif
     task_schedulers_.push_back(task_scheduler_ptr);
     std::shared_ptr<std::thread> thread (new std::thread (&TaskScheduler::Start, task_scheduler_ptr.get()));
-    thread->native_handle();
-    threads_.push_back(thread);
+    auto nativeHandle = thread->native_handle();
+    (void)nativeHandle;
+    threads_.push_back (thread);
   }
 
   const int priority = TASK_SCHEDULER_PRIORITY_REALTIME;

@@ -9,19 +9,19 @@ namespace xop {
 
 class TcpSocket {
   public:
-    TcpSocket(SOCKET sockfd=-1);
+    TcpSocket (SOCKET sockfd = -1);
     virtual ~TcpSocket();
 
     SOCKET Create();
-    bool   Bind(std::string ip, uint16_t port);
-    bool   Listen(int backlog);
+    bool   Bind (std::string ip, uint16_t port);
+    bool   Listen (int backlog);
     SOCKET Accept();
-    bool   Connect(std::string ip, uint16_t port, int timeout = 0);
+    bool   Connect (std::string ip, uint16_t port, int timeout = 0);
     void   Close();
     void   ShutdownWrite();
     SOCKET GetSocket() const { return sockfd_; }
 
   private:
-    SOCKET sockfd_ = -1;
+    SOCKET sockfd_ = (SOCKET)-1;
     };
   }
