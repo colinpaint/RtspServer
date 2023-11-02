@@ -2,11 +2,11 @@
 #include "RtspServer.h"
 #include "RtspConnection.h"
 
-#include "net/SocketUtil.h"
-#include "net/Logger.h"
+#include "SocketUtil.h"
+#include "Logger.h"
 //}}}
-using namespace xop;
 using namespace std;
+using namespace xop;
 
 RtspServer::RtspServer (EventLoop* loop) : TcpServer(loop) { }
 RtspServer::~RtspServer() { }

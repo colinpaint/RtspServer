@@ -7,8 +7,8 @@
 #include <random>
 #include "rtp.h"
 #include "media.h"
-#include "net/Socket.h"
-#include "net/TcpConnection.h"
+#include "Socket.h"
+#include "TcpConnection.h"
 //}}}
 
 namespace xop {

@@ -6,7 +6,7 @@
 #include <cstring>
 #include "rtp.h"
 #include "media.h"
-#include "net/BufferReader.h"
+#include "BufferReader.h"
 //}}}
 
 namespace xop {

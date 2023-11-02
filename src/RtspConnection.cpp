@@ -3,15 +3,14 @@
 #include "RtspServer.h"
 #include "MediaSession.h"
 #include "MediaSource.h"
-#include "net/SocketUtil.h"
+#include "SocketUtil.h"
 //}}}
+using namespace std;
+using namespace xop;
 
 #define RTSP_DEBUG 1
 #define USER_AGENT "-_-"
 #define MAX_RTSP_MESSAGE_SIZE 2048
-
-using namespace xop;
-using namespace std;
 
 //{{{
 RtspConnection::RtspConnection (std::shared_ptr<Rtsp> rtsp, TaskScheduler *task_scheduler, SOCKET sockfd)

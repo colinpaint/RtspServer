@@ -4,9 +4,9 @@
 #include <iomanip>
 #include <sstream>
 //}}}
-using namespace xop;
 using namespace std;
 using namespace std::chrono;
+using namespace xop;
 
 std::string Timestamp::Localtime() {
 

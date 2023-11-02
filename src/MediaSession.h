@@ -15,8 +15,8 @@
 #include "G711ASource.h"
 #include "AACSource.h"
 #include "MediaSource.h"
-#include "net/Socket.h"
-#include "net/RingBuffer.h"
+#include "Socket.h"
+#include "RingBuffer.h"
 //}}}
 
 namespace xop {

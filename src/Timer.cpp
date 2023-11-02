@@ -2,9 +2,9 @@
 #include "Timer.h"
 #include <iostream>
 //}}}
-using namespace xop;
 using namespace std;
 using namespace std::chrono;
+using namespace xop;
 
 //{{{
 TimerId TimerQueue::AddTimer (const TimerEvent& event, uint32_t ms)

@@ -9,10 +9,10 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
 endif()
 #
 project (rtsp_h264 VERSION 1.0.0)
-  file (GLOB FILES rtsp_h264_file.cpp net/*.hpp net/*.cpp xop/*.hpp xop/*.cpp md5.hpp)
+  file (GLOB FILES rtsp_h264_file.cpp src/*.hpp src/*.cpp md5.hpp)
   add_executable (${PROJECT_NAME} ${FILES})
 
-  target_include_directories (${PROJECT_NAME} PRIVATE .)
+  target_include_directories (${PROJECT_NAME} PRIVATE . src)
 
   message (STATUS "using ${CMAKE_HOST_SYSTEM_NAME}")
   if (CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)

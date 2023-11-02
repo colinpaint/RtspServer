@@ -1,9 +1,9 @@
 //{{{  includes
 #include "RtspPusher.h"
 #include "RtspConnection.h"
-#include "net/Logger.h"
-#include "net/TcpSocket.h"
-#include "net/Timestamp.h"
+#include "Logger.h"
+#include "TcpSocket.h"
+#include "Timestamp.h"
 #include <memory>
 //}}}
 using namespace xop;

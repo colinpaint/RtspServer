@@ -5,8 +5,8 @@
 #include "Logger.h"
 #include <cstdio>
 //}}}
-using namespace xop;
 using namespace std;
+using namespace xop;
 
 //{{{
 TcpServer::TcpServer (EventLoop* event_loop)

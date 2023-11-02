@@ -1,7 +1,7 @@
 //{{{  includes
 #include "RtpConnection.h"
 #include "RtspConnection.h"
-#include "net/SocketUtil.h"
+#include "SocketUtil.h"
 //}}}
 using namespace std;
 using namespace xop;

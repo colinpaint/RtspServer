@@ -13,8 +13,8 @@
   #include <sys/time.h>
 #endif
 //}}}
-using namespace xop;
 using namespace std;
+using namespace xop;
 
 //{{{
 VP8Source::VP8Source (uint32_t framerate)

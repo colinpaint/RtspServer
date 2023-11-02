@@ -14,8 +14,8 @@
   #include <sys/time.h>
 #endif
 //}}}
-using namespace xop;
 using namespace std;
+using namespace xop;
 
 //{{{
 AACSource::AACSource(uint32_t samplerate, uint32_t channels, bool has_adts)

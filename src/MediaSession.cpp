@@ -1,15 +1,17 @@
 //{{{  includes
 #include "MediaSession.h"
 #include "RtpConnection.h"
+
 #include <cstring>
 #include <ctime>
 #include <map>
 #include <forward_list>
-#include "net/Logger.h"
-#include "net/SocketUtil.h"
+
+#include "Logger.h"
+#include "SocketUtil.h"
 //}}}
-using namespace xop;
 using namespace std;
+using namespace xop;
 
 std::atomic_uint MediaSession::last_session_id_(1);
 

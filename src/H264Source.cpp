@@ -12,8 +12,8 @@
   #include <sys/time.h>
 #endif
 //}}}
-using namespace xop;
 using namespace std;
+using namespace xop;
 
 //{{{
 H264Source::H264Source (uint32_t framerate)
