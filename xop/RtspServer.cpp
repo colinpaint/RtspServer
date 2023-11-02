@@ -1,4 +1,3 @@
-// PHZ 2018-6-10
 //{{{  includes
 #include "RtspServer.h"
 #include "RtspConnection.h"

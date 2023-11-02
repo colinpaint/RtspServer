@@ -1,4 +1,3 @@
-// PHZ 2018-6-10
 //{{{  includes
 #include "RtspConnection.h"
 #include "RtspServer.h"
@@ -7,8 +6,8 @@
 #include "net/SocketUtil.h"
 //}}}
 
+#define RTSP_DEBUG 1
 #define USER_AGENT "-_-"
-#define RTSP_DEBUG 0
 #define MAX_RTSP_MESSAGE_SIZE 2048
 
 using namespace xop;
@@ -16,20 +15,18 @@ using namespace std;
 
 //{{{
 RtspConnection::RtspConnection (std::shared_ptr<Rtsp> rtsp, TaskScheduler *task_scheduler, SOCKET sockfd)
-  : TcpConnection(task_scheduler, sockfd)
-  , rtsp_(rtsp)
-  , task_scheduler_(task_scheduler)
-  , rtp_channel_(new Channel(sockfd))
-  , rtsp_request_(new RtspRequest)
-  , rtsp_response_(new RtspResponse)
-{
+    : TcpConnection(task_scheduler, sockfd),
+      rtsp_(rtsp) , task_scheduler_(task_scheduler),
+      rtp_channel_(new Channel(sockfd)), rtsp_request_(new RtspRequest),
+      rtsp_response_(new RtspResponse) {
+
   this->SetReadCallback([this](std::shared_ptr<TcpConnection> conn, xop::BufferReader& buffer) {
-    return this->OnRead(buffer);
-  });
+                           return this->OnRead(buffer);
+                           });
 
   this->SetCloseCallback([this](std::shared_ptr<TcpConnection> conn) {
-    this->OnClose();
-  });
+                           this->OnClose();
+                           });
 
   alive_count_ = 1;
 
@@ -38,27 +35,21 @@ RtspConnection::RtspConnection (std::shared_ptr<Rtsp> rtsp, TaskScheduler *task_
   rtp_channel_->SetCloseCallback([this]() { this->HandleClose(); });
   rtp_channel_->SetErrorCallback([this]() { this->HandleError(); });
 
-  for(int chn=0; chn<MAX_MEDIA_CHANNEL; chn++) {
+  for (int chn = 0; chn < MAX_MEDIA_CHANNEL; chn++)
     rtcp_channels_[chn] = nullptr;
-  }
 
   has_auth_ = true;
   if (rtsp->has_auth_info_) {
     has_auth_ = false;
-    auth_info_.reset(new DigestAuthentication(rtsp->realm_, rtsp->username_, rtsp->password_));
+    auth_info_.reset (new DigestAuthentication (rtsp->realm_, rtsp->username_, rtsp->password_));
+    }
   }
-}
 //}}}
-//{{{
-RtspConnection::~RtspConnection()
-{
-
-}
-//}}}
+RtspConnection::~RtspConnection() { }
 
 //{{{
-bool RtspConnection::OnRead (BufferReader& buffer)
-{
+bool RtspConnection::OnRead (BufferReader& buffer) {
+
   KeepAlive();
 
   int size = buffer.ReadableBytes();
@@ -106,11 +97,11 @@ void RtspConnection::OnClose() {
 //}}}
 
 //{{{
-bool RtspConnection::HandleRtspRequest(BufferReader& buffer) {
+bool RtspConnection::HandleRtspRequest (BufferReader& buffer) {
 
   #if RTSP_DEBUG
-    string str(buffer.Peek(), buffer.ReadableBytes());
-    if (str.find("rtsp") != string::npos || str.find("RTSP") != string::npos)
+    string str (buffer.Peek(), buffer.ReadableBytes());
+    if (str.find ("rtsp") != string::npos || str.find ("RTSP") != string::npos)
       std::cout << str << std::endl;
   #endif
 
@@ -120,7 +111,7 @@ bool RtspConnection::HandleRtspRequest(BufferReader& buffer) {
       HandleRtcp(buffer);
       return true;
       }
-    else if(!rtsp_request_->GotAll()) {
+    else if (!rtsp_request_->GotAll()) {
       return true;
       }
 
@@ -165,13 +156,13 @@ bool RtspConnection::HandleRtspRequest(BufferReader& buffer) {
   }
 //}}}
 //{{{
-bool RtspConnection::HandleRtspResponse(BufferReader& buffer) {
+bool RtspConnection::HandleRtspResponse (BufferReader& buffer) {
 
   #if RTSP_DEBUG
     string str(buffer.Peek(), buffer.ReadableBytes());
-    if (str.find("rtsp") != string::npos || str.find("RTSP") != string::npos) 
+    if (str.find("rtsp") != string::npos || str.find("RTSP") != string::npos)
       cout << str << endl;
-#endif
+  #endif
 
   if (rtsp_response_->ParseResponse(&buffer)) {
     RtspResponse::Method method = rtsp_response_->GetMethod();
@@ -179,44 +170,47 @@ bool RtspConnection::HandleRtspResponse(BufferReader& buffer) {
       case RtspResponse::OPTIONS:
         if (conn_mode_ == RTSP_PUSHER) {
           SendAnnounce();
-        }
+          }
         break;
+
       case RtspResponse::ANNOUNCE:
       case RtspResponse::DESCRIBE:
         SendSetup();
         break;
+
       case RtspResponse::SETUP:
         SendSetup();
         break;
+
       case RtspResponse::RECORD:
         HandleRecord();
         break;
+
       default:
         break;
       }
     }
-  else {
+  else
     return false;
-    }
 
   return true;
   }
 //}}}
 
 //{{{
-void RtspConnection::SendRtspMessage(std::shared_ptr<char> buf, uint32_t size) {
+void RtspConnection::SendRtspMessage (std::shared_ptr<char> buf, uint32_t size) {
 
   #if RTSP_DEBUG
     cout << buf.get() << endl;
   #endif
 
-  this->Send(buf, size);
+  this->Send (buf, size);
   return;
   }
 //}}}
 
 //{{{
-void RtspConnection::HandleRtcp(BufferReader& buffer) {
+void RtspConnection::HandleRtcp (BufferReader& buffer) {
 
   char *peek = buffer.Peek();
   if(peek[0] == '$' &&  buffer.ReadableBytes() > 4) {
@@ -228,7 +222,7 @@ void RtspConnection::HandleRtcp(BufferReader& buffer) {
   }
 //}}}
 //{{{
-void RtspConnection::HandleRtcp(SOCKET sockfd) {
+void RtspConnection::HandleRtcp (SOCKET sockfd) {
 
   char buf[1024] = {0};
   if(recv(sockfd, buf, 1024, 0) > 0) {
@@ -455,7 +449,7 @@ bool RtspConnection::HandleAuthentication() {
 //}}}
 
 //{{{
-void RtspConnection::SendOptions(ConnectionMode mode) {
+void RtspConnection::SendOptions (ConnectionMode mode) {
 
   if (rtp_conn_ == nullptr) {
     rtp_conn_.reset (new RtpConnection (shared_from_this()));

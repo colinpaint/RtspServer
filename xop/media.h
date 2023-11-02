@@ -1,4 +1,3 @@
-// PHZ 2018-6-10
 #pragma once
 #include <memory>
 

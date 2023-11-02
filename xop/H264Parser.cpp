@@ -1,4 +1,3 @@
-// PHZ 2018-6-10
 //{{{  includes
 #include "H264Parser.h"
 #include <cstring>

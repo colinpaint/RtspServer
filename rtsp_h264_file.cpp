@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 //}}}
+using namespace std;
 
 //{{{
 class H264File {
@@ -150,12 +151,12 @@ int H264File::ReadFrame (char* in_buf, int in_buf_size, bool* end) {
 void SendFrameThread (xop::RtspServer* rtsp_server, xop::MediaSessionId session_id, H264File* h264_file) {
 
   int buf_size = 2000000;
-  std::unique_ptr<uint8_t> frame_buf (new uint8_t[buf_size]);
+  unique_ptr<uint8_t> frame_buf (new uint8_t[buf_size]);
 
   while (true) {
     bool end_of_frame = false;
     int frame_size = h264_file->ReadFrame ((char*)frame_buf.get(), buf_size, &end_of_frame);
-    logInfo("frame size:%d", frame_size);
+    //logInfo ("frame size:%d", frame_size);
     if (frame_size > 0) {
       xop::AVFrame videoFrame = {0};
       videoFrame.type = 0;
@@ -186,13 +187,13 @@ int main (int argc, char** argv) {
     return 0;
     }
 
-  std::string ip = "127.0.0.1";
-  std::string port = "554";
-  std::string suffix = "live";
-  std::string rtsp_url = "rtsp://" + ip + ":" + port + "/" + suffix;
+  string ip = "127.0.0.1";
+  string port = "554";
+  string suffix = "live";
+  string rtsp_url = "rtsp://" + ip + ":" + port + "/" + suffix;
 
-  std::shared_ptr<xop::EventLoop> event_loop (new xop::EventLoop());
-  std::shared_ptr<xop::RtspServer> server = xop::RtspServer::Create (event_loop.get());
+  shared_ptr<xop::EventLoop> event_loop (new xop::EventLoop());
+  shared_ptr<xop::RtspServer> server = xop::RtspServer::Create (event_loop.get());
 
   if (!server->Start ("0.0.0.0", (uint16_t)atoi (port.c_str()))) {
     printf ("RTSP Server listen on %s failed.\n", port.c_str());
@@ -206,19 +207,19 @@ int main (int argc, char** argv) {
   xop::MediaSession* session = xop::MediaSession::CreateNew ("live");
   session->AddSource (xop::channel_0, xop::H264Source::CreateNew());
   //session->StartMulticast();
-  session->AddNotifyConnectedCallback([] (xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port) {
+  session->AddNotifyConnectedCallback([] (xop::MediaSessionId sessionId, string peer_ip, uint16_t peer_port) {
     printf ("RTSP client connect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
     });
-  session->AddNotifyDisconnectedCallback([](xop::MediaSessionId sessionId, std::string peer_ip, uint16_t peer_port) {
+  session->AddNotifyDisconnectedCallback([](xop::MediaSessionId sessionId, string peer_ip, uint16_t peer_port) {
     printf ("RTSP client disconnect, ip=%s, port=%hu \n", peer_ip.c_str(), peer_port);
     });
 
   xop::MediaSessionId session_id = server->AddSession (session);
 
-  std::thread t1 (SendFrameThread, server.get(), session_id, &h264_file);
+  thread t1 (SendFrameThread, server.get(), session_id, &h264_file);
   t1.detach();
 
-  std::cout << "Play URL: " << rtsp_url << std::endl;
+  cout << "Play URL: " << rtsp_url << endl;
 
   while (true)
     xop::Timer::Sleep (100);
